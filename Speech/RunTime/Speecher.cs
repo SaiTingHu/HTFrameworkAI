@@ -13,9 +13,8 @@ namespace HT.Framework.AI
     /// </summary>
     public static class Speecher
     {
-        private static readonly string API_KEY = "HW7lzGNrbswTBNGh7NL1wUPO";
-        private static readonly string SECRET_KEY = "LQzGyjshmz9s1KZAHBRf1CVRoVLpbsvK";
-
+        private static string APIKEY = "";
+        private static string SECRETKEY = "";
         private static SpeechCoroutiner Coroutiner;
         private static Queue<Tts> Ttss = new Queue<Tts>();
         private static Dictionary<string, object> TtsOptions = new Dictionary<string, object>()
@@ -27,10 +26,15 @@ namespace HT.Framework.AI
              {"aue", 6}
         };
 
-        public static Tts NewTts()
+        public static void SetAPIKEY(string apiKey)
         {
-            return new Tts(API_KEY, SECRET_KEY);
+            APIKEY = apiKey;
         }
+        public static void SetSECRETKEY(string SecretKey)
+        {
+            SECRETKEY = SecretKey;
+        }
+
         private static Tts GetTts()
         {
             Tts tts;
@@ -40,7 +44,7 @@ namespace HT.Framework.AI
             }
             else
             {
-                tts = new Tts(API_KEY, SECRET_KEY);
+                tts = new Tts(APIKEY, SECRETKEY);
             }
             return tts;
         }
@@ -74,6 +78,35 @@ namespace HT.Framework.AI
                 UnityEngine.Object.DontDestroyOnLoad(obj);
             }
 
+            Coroutiner.StartCoroutine(SynthesisCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
+        }
+        /// <summary>
+        /// 合成语音
+        /// </summary>
+        /// <param name="text">合成文本</param>
+        /// <param name="rule">合成规则</param>
+        /// <param name="handler">合成完毕后的处理者</param>
+        /// <param name="timeout">超时时长</param>
+        /// <param name="speaker">发音人</param>
+        /// <param name="volume">音量</param>
+        /// <param name="speed">音速</param>
+        /// <param name="pitch">音调</param>
+        public static void Synthesis(string text, SynthesisRule rule, Action<AudioClip> handler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        {
+            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            {
+                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                return;
+            }
+
+            if (!Coroutiner)
+            {
+                GameObject obj = new GameObject("Coroutiner");
+                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
+                UnityEngine.Object.DontDestroyOnLoad(obj);
+            }
+
+            text = rule.ApplyCustomTone(text);
             Coroutiner.StartCoroutine(SynthesisCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisCoroutine(string text, Action<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
@@ -128,6 +161,36 @@ namespace HT.Framework.AI
                 UnityEngine.Object.DontDestroyOnLoad(obj);
             }
 
+            Coroutiner.StartCoroutine(SynthesisCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
+        }
+        /// <summary>
+        /// 合成语音，并保存语音文件
+        /// </summary>
+        /// <param name="text">合成文本</param>
+        /// <param name="rule">合成规则</param>
+        /// <param name="savePath">语音文件保存路径</param>
+        /// <param name="timeout">超时时长</param>
+        /// <param name="audioType">音频文件格式</param>
+        /// <param name="speaker">发音人</param>
+        /// <param name="volume">音量</param>
+        /// <param name="speed">音速</param>
+        /// <param name="pitch">音调</param>
+        public static void Synthesis(string text, SynthesisRule rule, string savePath, AudioType audioType = AudioType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        {
+            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            {
+                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                return;
+            }
+
+            if (!Coroutiner)
+            {
+                GameObject obj = new GameObject("Coroutiner");
+                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
+                UnityEngine.Object.DontDestroyOnLoad(obj);
+            }
+
+            text = rule.ApplyCustomTone(text);
             Coroutiner.StartCoroutine(SynthesisCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisCoroutine(string text, string savePath, AudioType audioType, int timeout, Speaker speaker, int volume, int speed, int pitch)

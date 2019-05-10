@@ -18,6 +18,8 @@ namespace HT.Framework.AI
             window.Show();
         }
 
+        private string APIKEY = "";
+        private string SECRETKEY = "";
         private string _synthesisText = "";
         private Vector2 _synthesisTextScroll = Vector2.zero;
         private string _savePath = "";
@@ -28,12 +30,27 @@ namespace HT.Framework.AI
         private int _volume = 15;
         private int _speed = 5;
         private int _pitch = 5;
+        private Dictionary<string, object> _ttsOptions = new Dictionary<string, object>()
+        {
+             {"spd", 5},
+             {"pit", 5},
+             {"vol", 15},
+             {"per", 4},
+             {"aue", 3}
+        };
 
+        private void OnEnable()
+        {
+            APIKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_APIKEY, "");
+            SECRETKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_SECRETKEY, "");
+        }
         private void OnGUI()
         {
             TitleGUI();
+            SynthesisIdentityGUI();
             SynthesisTextGUI();
             SynthesisArgsGUI();
+            SynthesisButtonGUI();
         }
         private void TitleGUI()
         {
@@ -58,6 +75,32 @@ namespace HT.Framework.AI
             GUILayout.Label("Speech Synthesis in Editor");
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
+        }
+        private void SynthesisIdentityGUI()
+        {
+            GUILayout.BeginVertical("Box");
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("API Key:", GUILayout.Width(80));
+            string apikey = EditorGUILayout.PasswordField(APIKEY);
+            if (apikey != APIKEY)
+            {
+                APIKEY = apikey;
+                EditorPrefs.SetString(EditorPrefsTableAI.Speech_APIKEY, APIKEY);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Secret Key:", GUILayout.Width(80));
+            string secretkey = EditorGUILayout.PasswordField(SECRETKEY);
+            if (secretkey != SECRETKEY)
+            {
+                SECRETKEY = secretkey;
+                EditorPrefs.SetString(EditorPrefsTableAI.Speech_SECRETKEY, SECRETKEY);
+            }
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
         }
         private void SynthesisTextGUI()
         {
@@ -125,8 +168,10 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
-
-            GUI.enabled = (_synthesisText != "" && _saveName != "");
+        }
+        private void SynthesisButtonGUI()
+        {
+            GUI.enabled = (APIKEY != "" && SECRETKEY != "" && _synthesisText != "" && _saveName != "");
 
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Synthesis", "LargeButton"))
@@ -138,7 +183,7 @@ namespace HT.Framework.AI
 
             GUI.enabled = true;
         }
-        
+
         /// <summary>
         /// 合成语音，并保存语音文件（编辑器内）
         /// </summary>
@@ -162,16 +207,15 @@ namespace HT.Framework.AI
                 Debug.LogError("合成语音失败：已存在音频文件 " + savePath);
                 return;
             }
-            
-            Tts tts = Speecher.NewTts();
+
+            Tts tts = new Tts(APIKEY, SECRETKEY);
             tts.Timeout = timeout;
-            Dictionary<string, object> TtsOptions = new Dictionary<string, object>();
-            TtsOptions["spd"] = Mathf.Clamp(speed, 0, 9);
-            TtsOptions["pit"] = Mathf.Clamp(pitch, 0, 9);
-            TtsOptions["vol"] = Mathf.Clamp(volume, 0, 15);
-            TtsOptions["per"] = (int)speaker;
-            TtsOptions["aue"] = (int)audioType;
-            TtsResponse response = tts.Synthesis(text, TtsOptions);
+            _ttsOptions["spd"] = Mathf.Clamp(speed, 0, 9);
+            _ttsOptions["pit"] = Mathf.Clamp(pitch, 0, 9);
+            _ttsOptions["vol"] = Mathf.Clamp(volume, 0, 15);
+            _ttsOptions["per"] = (int)speaker;
+            _ttsOptions["aue"] = (int)audioType;
+            TtsResponse response = tts.Synthesis(text, _ttsOptions);
             if (response.Success)
             {
                 File.WriteAllBytes(savePath, response.Data);
