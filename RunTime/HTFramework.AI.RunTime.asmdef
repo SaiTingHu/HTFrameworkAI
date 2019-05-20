@@ -1,7 +1,7 @@
 {
-    "name": "HTFrameworkAI",
+    "name": "HTFramework.AI.RunTime",
     "references": [
-        "HTFramework"
+        "HTFramework.RunTime"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
