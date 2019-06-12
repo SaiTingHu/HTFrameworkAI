@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace HT.Framework.AI
 {
@@ -20,11 +21,12 @@ namespace HT.Framework.AI
 
         private string APIKEY = "";
         private string SECRETKEY = "";
+        private string TOKEN = "";
         private string _synthesisText = "";
         private Vector2 _synthesisTextScroll = Vector2.zero;
         private string _savePath = "";
         private string _saveName = "NewAudio";
-        private AudioType _format = AudioType.MP3;
+        private SynthesisType _format = SynthesisType.MP3;
         private int _timeout = 60000;
         private Speaker _speaker = Speaker.Woman;
         private int _volume = 15;
@@ -100,6 +102,20 @@ namespace HT.Framework.AI
             }
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Token:", GUILayout.Width(80));
+            EditorGUILayout.TextField(TOKEN);
+            GUI.enabled = (APIKEY != "" && SECRETKEY != "");
+            if (GUILayout.Button("Generate", "Minibutton", GUILayout.Width(60)))
+            {
+                string uri = string.Format("https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id={0}&client_secret={1}", APIKEY, SECRETKEY);
+                UnityWebRequest request = UnityWebRequest.Get(uri);
+                UnityWebRequestAsyncOperation async = request.SendWebRequest();
+                async.completed += UnityWebRequestAsyncOperationDone;
+            }
+            GUI.enabled = true;
+            GUILayout.EndHorizontal();
+
             GUILayout.EndVertical();
         }
         private void SynthesisTextGUI()
@@ -132,7 +148,7 @@ namespace HT.Framework.AI
             GUILayout.Label("Save Name:", GUILayout.Width(80));
             _saveName = EditorGUILayout.TextField(_saveName);
             GUILayout.Label("Format:");
-            _format = (AudioType)EditorGUILayout.EnumPopup(_format);
+            _format = (SynthesisType)EditorGUILayout.EnumPopup(_format);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -195,7 +211,7 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        private void SynthesisInEditor(string text, string savePath, AudioType audioType = AudioType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        private void SynthesisInEditor(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
@@ -225,6 +241,28 @@ namespace HT.Framework.AI
             else
             {
                 Debug.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
+            }
+        }
+
+        private void UnityWebRequestAsyncOperationDone(AsyncOperation asyncOperation)
+        {
+            UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
+            if (async != null)
+            {
+                if (string.IsNullOrEmpty(async.webRequest.error))
+                {
+                    JsonData json = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
+                    TOKEN = json["access_token"].ToString();
+                    Repaint();
+                }
+                else
+                {
+                    GlobalTools.LogError("获取Token失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
+                }
+            }
+            else
+            {
+                GlobalTools.LogError("获取Token失败：错误的请求操作！");
             }
         }
     }
