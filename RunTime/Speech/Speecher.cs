@@ -85,6 +85,35 @@ namespace HT.Framework.AI
 
             Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
         }
+        /// <summary>
+        /// 合成语音
+        /// </summary>
+        /// <param name="text">合成文本</param>
+        /// <param name="rule">合成规则</param>
+        /// <param name="handler">合成完毕后的处理者</param>
+        /// <param name="timeout">超时时长</param>
+        /// <param name="speaker">发音人</param>
+        /// <param name="volume">音量</param>
+        /// <param name="speed">音速</param>
+        /// <param name="pitch">音调</param>
+        public static void SynthesisByTOKEN(string text, SynthesisRule rule, HTFAction<AudioClip> handler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        {
+            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            {
+                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                return;
+            }
+
+            if (!Coroutiner)
+            {
+                GameObject obj = new GameObject("Coroutiner");
+                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
+                Object.DontDestroyOnLoad(obj);
+            }
+
+            text = rule.ApplyCustomTone(text);
+            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
+        }
         private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
             string url = string.Format("http://tsn.baidu.com/text2audio?tex={0}&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
