@@ -328,12 +328,9 @@ namespace HT.Framework.AI
 
         private List<AStarNode> WalkableNodefinding(AStarNode startNode, int cost)
         {
-            //重置所有节点的估价
-            foreach (AStarNode node in _nodes)
-            {
-                node.GCost = 0;
-                node.HCost = 0;
-            }
+            //重置起点的估价
+            startNode.GCost = 0;
+            startNode.HCost = 0;
 
             _openList.Clear();
             _openSet.Clear();
@@ -374,11 +371,9 @@ namespace HT.Framework.AI
                     }
                     else
                     {
-                        if (gCost < _neighbors[i].GCost)
-                        {
-                            _neighbors[i].GCost = gCost;
-                            _neighbors[i].Parent = currentNode;
-                        }
+                        _neighbors[i].GCost = gCost;
+                        _neighbors[i].Parent = currentNode;
+
                         if (_openSet.Contains(_neighbors[i]))
                         {
                             _openList.Remove(_neighbors[i]);
