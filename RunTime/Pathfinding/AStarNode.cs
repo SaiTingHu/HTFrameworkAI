@@ -14,15 +14,19 @@ namespace HT.Framework.AI
         /// <summary>
         /// 节点的世界坐标
         /// </summary>
-        public Vector3 WorldPoint;
+        public Vector3 WorldPoint { get; private set; }
         /// <summary>
         /// 节点在网格上的X位置
         /// </summary>
-        public int XIndex;
+        public int XIndex { get; private set; }
         /// <summary>
         /// 节点在网格上的Y位置
         /// </summary>
-        public int YIndex;
+        public int YIndex { get; private set; }
+        /// <summary>
+        /// 当前节点自身的固定估价
+        /// </summary>
+        public int OCost = 0;
         /// <summary>
         /// 起始点到当前节点的估价
         /// </summary>
@@ -43,7 +47,7 @@ namespace HT.Framework.AI
         {
             get
             {
-                return GCost + HCost;
+                return GCost + HCost + OCost;
             }
         }
         

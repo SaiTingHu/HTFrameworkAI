@@ -37,8 +37,10 @@ namespace HT.Framework.AI
         private int _nodesWidth, _nodesHeight;
         //网格的所有节点
         private AStarNode[,] _nodes;
-        //结果路径
+        //寻路的结果路径
         private List<AStarNode> _resultPath = new List<AStarNode>();
+        //寻可行走节点的结果组
+        private List<AStarNode> _resultNodes = new List<AStarNode>();
         //节点的相邻节点组
         private List<AStarNode> _neighbors = new List<AStarNode>();
         //寻路的开启列表
@@ -147,6 +149,52 @@ namespace HT.Framework.AI
             return Pathfinding(GetNode(startPoint), GetNode(endPoint));
         }
 
+        /// <summary>
+        /// 寻可行走节点
+        /// </summary>
+        /// <param name="startIndex">起点</param>
+        /// <param name="cost">可行走节点到起点的最大估价</param>
+        /// <param name="rule">搜寻规则</param>
+        /// <returns>结果节点组</returns>
+        public List<AStarNode> WalkableNodefinding(Vector2Int startIndex, int cost, AStarRule rule = null)
+        {
+            if (startIndex.x < 0 || startIndex.x >= _nodesWidth || startIndex.y < 0 || startIndex.y >= _nodesHeight)
+            {
+                GlobalTools.LogWarning("A*：寻可行走节点失败，起点的索引超出了网格的大小！");
+                return null;
+            }
+
+            if (rule != null)
+            {
+                foreach (AStarNode node in _nodes)
+                {
+                    rule.Apply(node);
+                }
+            }
+
+            return WalkableNodefinding(_nodes[startIndex.x, startIndex.y], cost);
+        }
+
+        /// <summary>
+        /// 寻可行走节点
+        /// </summary>
+        /// <param name="startPoint">起点</param>
+        /// <param name="cost">可行走节点到起点的最大估价</param>
+        /// <param name="rule">搜寻规则</param>
+        /// <returns>结果节点组</returns>
+        public List<AStarNode> WalkableNodefinding(Vector3 startPoint, int cost, AStarRule rule = null)
+        {
+            if (rule != null)
+            {
+                foreach (AStarNode node in _nodes)
+                {
+                    rule.Apply(node);
+                }
+            }
+
+            return WalkableNodefinding(GetNode(startPoint), cost);
+        }
+
         private void CreateGrid()
         {
             //从网格平面的左下角坐标开始
@@ -207,6 +255,10 @@ namespace HT.Framework.AI
 
         private List<AStarNode> Pathfinding(AStarNode startNode, AStarNode endNode)
         {
+            //重置起点的估价
+            startNode.GCost = 0;
+            startNode.HCost = 0;
+
             _openList.Clear();
             _openSet.Clear();
             _closeSet.Clear();
@@ -235,14 +287,14 @@ namespace HT.Framework.AI
                     return GeneratePath(startNode, endNode);
                 }
 
-                //遍历当前节点的相邻节点，更新GCost并加入开启列表
+                //遍历当前节点的相邻节点，更新估价并加入开启列表
                 GetNeighbor(currentNode);
                 for (int i = 0; i < _neighbors.Count; i++)
                 {
                     if (!_neighbors[i].IsCanWalk || _closeSet.Contains(_neighbors[i]))
                         continue;
 
-                    int gCost = currentNode.GCost + _evaluation.Evaluation(currentNode, _neighbors[i]);
+                    int gCost = currentNode.GCost + _evaluation.Evaluation(currentNode, _neighbors[i]) + _neighbors[i].OCost;
                     if (gCost < _neighbors[i].GCost || !_openSet.Contains(_neighbors[i]))
                     {
                         _neighbors[i].GCost = gCost;
@@ -272,6 +324,81 @@ namespace HT.Framework.AI
             }
             _resultPath.Reverse();
             return _resultPath;
+        }
+
+        private List<AStarNode> WalkableNodefinding(AStarNode startNode, int cost)
+        {
+            //重置所有节点的估价
+            foreach (AStarNode node in _nodes)
+            {
+                node.GCost = 0;
+                node.HCost = 0;
+            }
+
+            _openList.Clear();
+            _openSet.Clear();
+            _closeSet.Clear();
+
+            //将开始节点加入到开启列表中
+            _openList.Add(startNode);
+            _openSet.Add(startNode);
+            while (_openList.Count > 0)
+            {
+                //从开启列表中任意取出一个节点
+                AStarNode currentNode = _openList[0];
+
+                _openList.Remove(currentNode);
+                _openSet.Remove(currentNode);
+                _closeSet.Add(currentNode);
+
+                //遍历当前节点的相邻节点，更新估价，估价低于限制估价的加入开启列表，否则加入关闭列表
+                GetNeighbor(currentNode);
+                for (int i = 0; i < _neighbors.Count; i++)
+                {
+                    if (!_neighbors[i].IsCanWalk || _closeSet.Contains(_neighbors[i]))
+                        continue;
+
+                    int gCost = currentNode.GCost + _evaluation.Evaluation(currentNode, _neighbors[i]) + _neighbors[i].OCost;
+                    if (gCost <= cost)
+                    {
+                        if (gCost < _neighbors[i].GCost || !_openSet.Contains(_neighbors[i]))
+                        {
+                            _neighbors[i].GCost = gCost;
+                            _neighbors[i].Parent = currentNode;
+                            if (!_openSet.Contains(_neighbors[i]))
+                            {
+                                _openList.Add(_neighbors[i]);
+                                _openSet.Add(_neighbors[i]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (gCost < _neighbors[i].GCost)
+                        {
+                            _neighbors[i].GCost = gCost;
+                            _neighbors[i].Parent = currentNode;
+                        }
+                        if (_openSet.Contains(_neighbors[i]))
+                        {
+                            _openList.Remove(_neighbors[i]);
+                            _openSet.Remove(_neighbors[i]);
+                        }
+                        _closeSet.Add(_neighbors[i]);
+                    }
+                }
+            }
+
+            //找到所有估价合格的节点
+            _resultNodes.Clear();
+            foreach (AStarNode node in _closeSet)
+            {
+                if (node.GCost <= cost)
+                {
+                    _resultNodes.Add(node);
+                }
+            }
+            return _resultNodes;
         }
     }
 }
