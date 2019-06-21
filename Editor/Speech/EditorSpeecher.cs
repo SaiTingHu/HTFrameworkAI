@@ -10,7 +10,7 @@ namespace HT.Framework.AI
 {
     public sealed class EditorSpeecher : EditorWindow
     {
-        [MenuItem("HTFramework.AI/Editor Speecher")]
+        [MenuItem("HTFramework.AI/Speech/Editor Speecher")]
         private static void OpenEditorSpeecher()
         {
             EditorSpeecher window = GetWindow<EditorSpeecher>();
@@ -215,12 +215,12 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
             if (File.Exists(savePath))
             {
-                Debug.LogError("合成语音失败：已存在音频文件 " + savePath);
+                GlobalTools.LogError("合成语音失败：已存在音频文件 " + savePath);
                 return;
             }
 
@@ -240,7 +240,7 @@ namespace HT.Framework.AI
             }
             else
             {
-                Debug.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
+                GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
             }
         }
 

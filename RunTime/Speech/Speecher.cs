@@ -72,7 +72,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
 
@@ -111,7 +111,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            text = rule.ApplyCustomTone(text);
+            text = rule.Apply(text);
             Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
@@ -129,17 +129,16 @@ namespace HT.Framework.AI
                 {
                     AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
 
-                    if (handler != null)
-                        handler(clip);
+                    handler?.Invoke(clip);
                 }
                 else
                 {
-                    Debug.LogError("合成语音失败：获取到错误的合成结果类型 " + type);
+                    GlobalTools.LogError("合成语音失败：获取到错误的合成结果类型 " + type);
                 }
             }
             else
             {
-                Debug.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+                GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
             }
         }
 
@@ -157,7 +156,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
 
@@ -185,7 +184,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
 
@@ -196,7 +195,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            text = rule.ApplyCustomTone(text);
+            text = rule.Apply(text);
             Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisByKEYCoroutine(string text, HTFAction<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
@@ -215,12 +214,11 @@ namespace HT.Framework.AI
                 AudioClip audioClip = SpeechUtility.ToAudioClip(response.Data);
                 yield return audioClip;
 
-                if (handler != null)
-                    handler(audioClip);
+                handler?.Invoke(audioClip);
             }
             else
             {
-                Debug.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
+                GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
             }
             RecycleTts(tts);
         }
@@ -240,7 +238,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
 
@@ -269,7 +267,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                Debug.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
 
@@ -280,7 +278,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            text = rule.ApplyCustomTone(text);
+            text = rule.Apply(text);
             Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisByKEYCoroutine(string text, string savePath, SynthesisType audioType, int timeout, Speaker speaker, int volume, int speed, int pitch)
