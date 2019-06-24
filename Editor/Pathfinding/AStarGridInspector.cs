@@ -10,7 +10,7 @@ namespace HT.Framework.AI
     {
         private AStarGrid _target;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
             _target = target as AStarGrid;
         }
