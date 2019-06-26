@@ -116,25 +116,16 @@ namespace HT.Framework.AI
         }
         private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
-            string url = string.Format("http://tsn.baidu.com/text2audio?tex={0}&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
+            string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
                 text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, 6);
 
             UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV);
             yield return request.SendWebRequest();
-
-            if (string.IsNullOrEmpty(request.error))
+            if (!request.isNetworkError && !request.isHttpError)
             {
-                string type = request.GetResponseHeader("Content-Type");
-                if (type.Contains("audio"))
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
+                AudioClip audioClip = SpeechUtility.ToAudioClip(request.downloadHandler.data);
 
-                    handler?.Invoke(clip);
-                }
-                else
-                {
-                    GlobalTools.LogError("合成语音失败：获取到错误的合成结果类型 " + type);
-                }
+                handler?.Invoke(audioClip);
             }
             else
             {
@@ -212,7 +203,6 @@ namespace HT.Framework.AI
             if (response.Success)
             {
                 AudioClip audioClip = SpeechUtility.ToAudioClip(response.Data);
-                yield return audioClip;
 
                 handler?.Invoke(audioClip);
             }
@@ -295,7 +285,6 @@ namespace HT.Framework.AI
             if (response.Success)
             {
                 File.WriteAllBytes(savePath, response.Data);
-                yield return null;
             }
             else
             {
