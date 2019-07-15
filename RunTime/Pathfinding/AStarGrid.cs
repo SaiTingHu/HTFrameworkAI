@@ -69,12 +69,7 @@ namespace HT.Framework.AI
                 return;
             }
 
-            _nodeDiameter = NodeRadius * 2;
-            _nodesWidth = Mathf.RoundToInt(Size.x / _nodeDiameter);
-            _nodesHeight = Mathf.RoundToInt(Size.y / _nodeDiameter);
-            _nodes = new AStarNode[_nodesWidth, _nodesHeight];
-            
-            CreateGrid();
+            GenerateGrid();
         }
 
         private void OnDrawGizmos()
@@ -100,6 +95,19 @@ namespace HT.Framework.AI
                     Gizmos.DrawCube(_resultPath[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
                 }
             }
+        }
+
+        /// <summary>
+        /// 生成网格
+        /// </summary>
+        public void GenerateGrid()
+        {
+            _nodeDiameter = NodeRadius * 2;
+            _nodesWidth = Mathf.RoundToInt(Size.x / _nodeDiameter);
+            _nodesHeight = Mathf.RoundToInt(Size.y / _nodeDiameter);
+            _nodes = new AStarNode[_nodesWidth, _nodesHeight];
+
+            CreateGrid();
         }
 
         /// <summary>
