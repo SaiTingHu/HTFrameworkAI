@@ -6,20 +6,15 @@ using UnityEngine;
 namespace HT.Framework.AI
 {
     [CustomEditor(typeof(AStarGrid))]
-    public sealed class AStarGridInspector : ModuleEditor
+    public sealed class AStarGridInspector : HTFEditor<AStarGrid>
     {
-        private AStarGrid _target;
-
-        protected override void OnEnable()
+        protected override void OnInspectorDefaultGUI()
         {
-            _target = target as AStarGrid;
-        }
+            base.OnInspectorDefaultGUI();
 
-        public override void OnInspectorGUI()
-        {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Evaluation Type ", GUILayout.Width(100));
-            if (GUILayout.Button(_target.EvaluationType, "MiniPopup"))
+            if (GUILayout.Button(Target.EvaluationType, "MiniPopup"))
             {
                 GenericMenu gm = new GenericMenu();
                 List<Type> types = GlobalTools.GetTypesInRunTimeAssemblies();
@@ -28,10 +23,10 @@ namespace HT.Framework.AI
                     if (types[i].BaseType == typeof(AStarEvaluation))
                     {
                         int j = i;
-                        gm.AddItem(new GUIContent(types[j].FullName), _target.EvaluationType == types[j].FullName, () =>
+                        gm.AddItem(new GUIContent(types[j].FullName), Target.EvaluationType == types[j].FullName, () =>
                         {
                             Undo.RecordObject(target, "Set Evaluation");
-                            _target.EvaluationType = types[j].FullName;
+                            Target.EvaluationType = types[j].FullName;
                             HasChanged();
                         });
                     }
@@ -42,16 +37,16 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Size", GUILayout.Width(100));
-            Vector2Field(_target.Size, out _target.Size, "");
+            Vector2Field(Target.Size, out Target.Size, "");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Node Radius", GUILayout.Width(100));
-            FloatField(_target.NodeRadius, out _target.NodeRadius, "");
+            FloatField(Target.NodeRadius, out Target.NodeRadius, "");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            Toggle(_target.IsIgnoreOblique, out _target.IsIgnoreOblique, "Ignore Oblique");
+            Toggle(Target.IsIgnoreOblique, out Target.IsIgnoreOblique, "Ignore Oblique");
             GUILayout.EndHorizontal();
         }
     }
