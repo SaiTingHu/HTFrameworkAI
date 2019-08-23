@@ -20,7 +20,7 @@ namespace HT.Framework.AI
                 List<Type> types = GlobalTools.GetTypesInRunTimeAssemblies();
                 for (int i = 0; i < types.Count; i++)
                 {
-                    if (types[i].BaseType == typeof(AStarEvaluation))
+                    if (types[i].IsSubclassOf(typeof(AStarEvaluation)))
                     {
                         int j = i;
                         gm.AddItem(new GUIContent(types[j].FullName), Target.EvaluationType == types[j].FullName, () =>
