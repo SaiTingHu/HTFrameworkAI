@@ -105,7 +105,7 @@ namespace HT.Framework.AI
 
             public override string ToString()
             {
-                return string.Format("{0}({1}{2})", Word, Pinyin, Tone);
+                return Word + "(" + Pinyin + Tone.ToString() + ")";
             }
         }
     }

@@ -236,7 +236,7 @@ namespace HT.Framework.AI
             {
                 File.WriteAllBytes(savePath, response.Data);
                 AssetDatabase.Refresh();
-                Selection.activeObject = AssetDatabase.LoadAssetAtPath(string.Format("Assets{0}/{1}.{2}", _savePath, _saveName, _format), typeof(AudioClip));
+                Selection.activeObject = AssetDatabase.LoadAssetAtPath(GlobalTools.StringConcat("Assets", _savePath, "/", _saveName, ".", _format.ToString()), typeof(AudioClip));
             }
             else
             {
