@@ -288,7 +288,7 @@ namespace HT.Framework.AI
             }
             else
             {
-                Debug.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
+                GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
             }
             RecycleTts(tts);
         }
