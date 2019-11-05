@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 namespace HT.Framework.AI
 {
-    public sealed class EditorSpeecher : EditorWindow
+    public sealed class EditorSpeecher : HTFEditorWindow
     {
         [MenuItem("HTFramework.AI/Speech/Editor Speecher")]
         private static void OpenEditorSpeecher()
@@ -46,17 +46,10 @@ namespace HT.Framework.AI
             APIKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_APIKEY, "");
             SECRETKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_SECRETKEY, "");
         }
-        private void OnGUI()
+        protected override void OnTitleGUI()
         {
-            TitleGUI();
-            SynthesisIdentityGUI();
-            SynthesisTextGUI();
-            SynthesisArgsGUI();
-            SynthesisButtonGUI();
-        }
-        private void TitleGUI()
-        {
-            GUILayout.BeginHorizontal("Toolbar");
+            base.OnTitleGUI();
+
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("About", "Toolbarbutton"))
             {
@@ -70,16 +63,25 @@ namespace HT.Framework.AI
             {
                 Application.OpenURL(@"https://login.bce.baidu.com/");
             }
-            GUILayout.EndHorizontal();
+        }
+        protected override void OnBodyGUI()
+        {
+            base.OnBodyGUI();
 
+            SynthesisIdentityGUI();
+            SynthesisTextGUI();
+            SynthesisArgsGUI();
+            SynthesisButtonGUI();
+        }
+        private void SynthesisIdentityGUI()
+        {
             GUILayout.BeginHorizontal("DD HeaderStyle");
             GUILayout.FlexibleSpace();
             GUILayout.Label("Speech Synthesis in Editor");
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-        }
-        private void SynthesisIdentityGUI()
-        {
+
+
             GUILayout.BeginVertical("Box");
 
             GUILayout.BeginHorizontal();
