@@ -68,7 +68,7 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByTOKEN(string text, HTFAction<AudioClip> handler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static void SynthesisByTOKEN(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
@@ -83,7 +83,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
+            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
         /// 合成语音
@@ -96,7 +96,7 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByTOKEN(string text, SynthesisRule rule, HTFAction<AudioClip> handler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static void SynthesisByTOKEN(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
@@ -112,9 +112,9 @@ namespace HT.Framework.AI
             }
 
             text = rule.Apply(text);
-            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
+            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
-        private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
+        private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
             string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
                 text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, 6);
@@ -130,6 +130,8 @@ namespace HT.Framework.AI
             else
             {
                 GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+
+                failHandler?.Invoke();
             }
         }
 
@@ -143,7 +145,7 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByKEY(string text, HTFAction<AudioClip> handler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static void SynthesisByKEY(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
@@ -158,7 +160,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
+            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
         /// 合成语音
@@ -171,7 +173,7 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByKEY(string text, SynthesisRule rule, HTFAction<AudioClip> handler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static void SynthesisByKEY(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
@@ -187,9 +189,9 @@ namespace HT.Framework.AI
             }
 
             text = rule.Apply(text);
-            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, timeout, speaker, volume, speed, pitch));
+            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
-        private static IEnumerator SynthesisByKEYCoroutine(string text, HTFAction<AudioClip> handler, int timeout, Speaker speaker, int volume, int speed, int pitch)
+        private static IEnumerator SynthesisByKEYCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
             Tts tts = GetTts();
             tts.Timeout = timeout;
@@ -209,6 +211,8 @@ namespace HT.Framework.AI
             else
             {
                 GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
+
+                failHandler?.Invoke();
             }
             RecycleTts(tts);
         }
