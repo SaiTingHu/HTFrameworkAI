@@ -68,12 +68,13 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByTOKEN(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        /// <returns>合成语音的协程</returns>
+        public static Coroutine SynthesisByTOKEN(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return;
+                return null;
             }
 
             if (!Coroutiner)
@@ -83,7 +84,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            return Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
         /// 合成语音
@@ -96,12 +97,13 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByTOKEN(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        /// <returns>合成语音的协程</returns>
+        public static Coroutine SynthesisByTOKEN(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return;
+                return null;
             }
 
             if (!Coroutiner)
@@ -112,7 +114,7 @@ namespace HT.Framework.AI
             }
 
             text = rule.Apply(text);
-            Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            return Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
@@ -145,12 +147,13 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByKEY(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        /// <returns>合成语音的协程</returns>
+        public static Coroutine SynthesisByKEY(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return;
+                return null;
             }
 
             if (!Coroutiner)
@@ -160,7 +163,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
         /// 合成语音
@@ -173,12 +176,13 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByKEY(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        /// <returns>合成语音的协程</returns>
+        public static Coroutine SynthesisByKEY(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return;
+                return null;
             }
 
             if (!Coroutiner)
@@ -189,7 +193,7 @@ namespace HT.Framework.AI
             }
 
             text = rule.Apply(text);
-            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisByKEYCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
@@ -228,12 +232,13 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByKEY(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        /// <returns>合成语音的协程</returns>
+        public static Coroutine SynthesisByKEY(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return;
+                return null;
             }
 
             if (!Coroutiner)
@@ -243,7 +248,7 @@ namespace HT.Framework.AI
                 Object.DontDestroyOnLoad(obj);
             }
 
-            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
+            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
         /// 合成语音，并保存语音文件
@@ -257,12 +262,13 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        public static void SynthesisByKEY(string text, SynthesisRule rule, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        /// <returns>合成语音的协程</returns>
+        public static Coroutine SynthesisByKEY(string text, SynthesisRule rule, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return;
+                return null;
             }
 
             if (!Coroutiner)
@@ -273,7 +279,7 @@ namespace HT.Framework.AI
             }
 
             text = rule.Apply(text);
-            Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
+            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
         }
         private static IEnumerator SynthesisByKEYCoroutine(string text, string savePath, SynthesisType audioType, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
