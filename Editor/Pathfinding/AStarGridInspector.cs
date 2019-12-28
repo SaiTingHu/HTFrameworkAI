@@ -8,13 +8,21 @@ namespace HT.Framework.AI
     [CustomEditor(typeof(AStarGrid))]
     public sealed class AStarGridInspector : HTFEditor<AStarGrid>
     {
+        protected override bool IsEnableRuntimeData
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         protected override void OnInspectorDefaultGUI()
         {
             base.OnInspectorDefaultGUI();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Evaluation Type ", GUILayout.Width(100));
-            if (GUILayout.Button(Target.EvaluationType, "MiniPopup"))
+            if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup))
             {
                 GenericMenu gm = new GenericMenu();
                 List<Type> types = GlobalTools.GetTypesInRunTimeAssemblies();

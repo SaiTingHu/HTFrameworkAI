@@ -1,6 +1,4 @@
-﻿using Baidu.Aip.Speech;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
@@ -15,7 +13,8 @@ namespace HT.Framework.AI
         {
             EditorSpeecher window = GetWindow<EditorSpeecher>();
             window.titleContent.text = "Speecher";
-            window.position = new Rect(200, 200, 400, 400);
+            window.minSize = new Vector2(400, 400);
+            window.maxSize = new Vector2(400, 400);
             window.Show();
         }
 
@@ -25,6 +24,7 @@ namespace HT.Framework.AI
         private string _synthesisText = "";
         private Vector2 _synthesisTextScroll = Vector2.zero;
         private string _savePath = "";
+        private string _saveFullPath = "";
         private string _saveName = "NewAudio";
         private SynthesisType _format = SynthesisType.MP3;
         private int _timeout = 60000;
@@ -32,34 +32,24 @@ namespace HT.Framework.AI
         private int _volume = 15;
         private int _speed = 5;
         private int _pitch = 5;
-        private Dictionary<string, object> _ttsOptions = new Dictionary<string, object>()
-        {
-             {"spd", 5},
-             {"pit", 5},
-             {"vol", 15},
-             {"per", 4},
-             {"aue", 3}
-        };
+        private bool _isSynthesis = false;
 
         private void OnEnable()
         {
             APIKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_APIKEY, "");
             SECRETKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_SECRETKEY, "");
+            TOKEN = EditorPrefs.GetString(EditorPrefsTableAI.Speech_TOKEN, "");
         }
         protected override void OnTitleGUI()
         {
             base.OnTitleGUI();
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("About", "Toolbarbutton"))
+            if (GUILayout.Button("About", EditorStyles.toolbarButton))
             {
                 Application.OpenURL(@"http://ai.baidu.com/");
             }
-            if (GUILayout.Button("SDK", "Toolbarbutton"))
-            {
-                Application.OpenURL(@"http://ai.baidu.com/docs#/TTS-Online-Csharp-SDK/top");
-            }
-            if (GUILayout.Button("Console Login", "Toolbarbutton"))
+            if (GUILayout.Button("Console Login", EditorStyles.toolbarButton))
             {
                 Application.OpenURL(@"https://login.bce.baidu.com/");
             }
@@ -82,7 +72,7 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
 
-            GUILayout.BeginVertical("Box");
+            GUILayout.BeginVertical(EditorGlobalTools.Styles.Box);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("API Key:", GUILayout.Width(80));
@@ -108,12 +98,12 @@ namespace HT.Framework.AI
             GUILayout.Label("Token:", GUILayout.Width(80));
             EditorGUILayout.TextField(TOKEN);
             GUI.enabled = (APIKEY != "" && SECRETKEY != "");
-            if (GUILayout.Button("Generate", "Minibutton", GUILayout.Width(60)))
+            if (GUILayout.Button("Generate", EditorStyles.miniButton, GUILayout.Width(60)))
             {
                 string uri = string.Format("https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id={0}&client_secret={1}", APIKEY, SECRETKEY);
                 UnityWebRequest request = UnityWebRequest.Get(uri);
                 UnityWebRequestAsyncOperation async = request.SendWebRequest();
-                async.completed += UnityWebRequestAsyncOperationDone;
+                async.completed += GenerateTOKENDone;
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
@@ -122,7 +112,7 @@ namespace HT.Framework.AI
         }
         private void SynthesisTextGUI()
         {
-            GUILayout.BeginVertical("Box");
+            GUILayout.BeginVertical(EditorGlobalTools.Styles.Box);
             GUILayout.Label("Synthesis Text:");
             _synthesisTextScroll = GUILayout.BeginScrollView(_synthesisTextScroll);
             _synthesisText = EditorGUILayout.TextArea(_synthesisText);
@@ -131,12 +121,12 @@ namespace HT.Framework.AI
         }
         private void SynthesisArgsGUI()
         {
-            GUILayout.BeginVertical("Box");
+            GUILayout.BeginVertical(EditorGlobalTools.Styles.Box);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Save Path:", GUILayout.Width(80));
-            _savePath = EditorGUILayout.TextField(_savePath);
-            if (GUILayout.Button("Browse", "Minibutton"))
+            EditorGUILayout.TextField(_savePath);
+            if (GUILayout.Button("Browse", EditorStyles.miniButton))
             {
                 string path = EditorUtility.OpenFolderPanel("Select Save Path", Application.dataPath, "");
                 if (path.Length != 0)
@@ -148,26 +138,28 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Save Name:", GUILayout.Width(80));
-            _saveName = EditorGUILayout.TextField(_saveName);
+            _saveName = EditorGUILayout.TextField(_saveName, GUILayout.Width(120));
             GUILayout.Label("Format:");
             _format = (SynthesisType)EditorGUILayout.EnumPopup(_format);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Timeout:", GUILayout.Width(80));
-            _timeout = EditorGUILayout.IntField(_timeout);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
             GUILayout.Label("Speaker:", GUILayout.Width(80));
-            bool man = GUILayout.Toggle(_speaker == Speaker.Man, "Man");
-            if (man) _speaker = Speaker.Man;
-            bool woman = GUILayout.Toggle(_speaker == Speaker.Woman, "Woman");
-            if (woman) _speaker = Speaker.Woman;
-            bool man_DuXiaoYao = GUILayout.Toggle(_speaker == Speaker.Man_DuXiaoYao, "Man_DXY");
-            if (man_DuXiaoYao) _speaker = Speaker.Man_DuXiaoYao;
-            bool woman_DuYaYa = GUILayout.Toggle(_speaker == Speaker.Woman_DuYaYa, "Woman_DYY");
-            if (woman_DuYaYa) _speaker = Speaker.Woman_DuYaYa;
+            if (GUILayout.Button(_speaker.GetRemark(), EditorGlobalTools.Styles.MiniPopup, GUILayout.Width(120)))
+            {
+                GenericMenu gm = new GenericMenu();
+                foreach (var speaker in typeof(Speaker).GetEnumValues())
+                {
+                    Speaker s = (Speaker)speaker;
+                    gm.AddItem(new GUIContent(s.GetRemark()), _speaker == s, () =>
+                    {
+                        _speaker = s;
+                    });
+                }
+                gm.ShowAsContext();
+            }
+            GUILayout.Label("Timeout:");
+            _timeout = EditorGUILayout.IntField(_timeout);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -189,13 +181,13 @@ namespace HT.Framework.AI
         }
         private void SynthesisButtonGUI()
         {
-            GUI.enabled = (APIKEY != "" && SECRETKEY != "" && _synthesisText != "" && _saveName != "");
+            GUI.enabled = (!_isSynthesis && TOKEN != "" && _synthesisText != "" && _saveName != "");
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Synthesis", "LargeButton"))
+            if (GUILayout.Button("Synthesis", EditorGlobalTools.Styles.LargeButton))
             {
-                string path = string.Format("{0}{1}/{2}.{3}", Application.dataPath, _savePath, _saveName, _format);
-                SynthesisInEditor(_synthesisText, path, _format, _timeout, _speaker, _volume, _speed, _pitch);
+                _saveFullPath = string.Format("{0}{1}/{2}.{3}", Application.dataPath, _savePath, _saveName, _format);
+                SynthesisInEditor(_synthesisText, _saveFullPath, _format, _timeout, _speaker, _volume, _speed, _pitch);
             }
             GUILayout.EndHorizontal();
 
@@ -213,7 +205,7 @@ namespace HT.Framework.AI
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
-        private void SynthesisInEditor(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        private void SynthesisInEditor(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
@@ -226,27 +218,16 @@ namespace HT.Framework.AI
                 return;
             }
 
-            Tts tts = new Tts(APIKEY, SECRETKEY);
-            tts.Timeout = timeout;
-            _ttsOptions["spd"] = Mathf.Clamp(speed, 0, 9);
-            _ttsOptions["pit"] = Mathf.Clamp(pitch, 0, 9);
-            _ttsOptions["vol"] = Mathf.Clamp(volume, 0, 15);
-            _ttsOptions["per"] = (int)speaker;
-            _ttsOptions["aue"] = (int)audioType;
-            TtsResponse response = tts.Synthesis(text, _ttsOptions);
-            if (response.Success)
-            {
-                File.WriteAllBytes(savePath, response.Data);
-                AssetDatabase.Refresh();
-                Selection.activeObject = AssetDatabase.LoadAssetAtPath(GlobalTools.StringConcat("Assets", _savePath, "/", _saveName, ".", _format.ToString()), typeof(AudioClip));
-            }
-            else
-            {
-                GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
-            }
+            string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
+                text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, (int)audioType);
+
+            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType == SynthesisType.MP3 ? AudioType.MPEG : AudioType.WAV);
+            UnityWebRequestAsyncOperation async = request.SendWebRequest();
+            async.completed += SynthesisDone;
+            _isSynthesis = true;
         }
 
-        private void UnityWebRequestAsyncOperationDone(AsyncOperation asyncOperation)
+        private void GenerateTOKENDone(AsyncOperation asyncOperation)
         {
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
             if (async != null)
@@ -255,6 +236,7 @@ namespace HT.Framework.AI
                 {
                     JsonData json = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
                     TOKEN = json["access_token"].ToString();
+                    EditorPrefs.SetString(EditorPrefsTableAI.Speech_TOKEN, TOKEN);
                     Repaint();
                 }
                 else
@@ -266,6 +248,29 @@ namespace HT.Framework.AI
             {
                 GlobalTools.LogError("获取Token失败：错误的请求操作！");
             }
+        }
+
+        private void SynthesisDone(AsyncOperation asyncOperation)
+        {
+            UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
+            if (async != null)
+            {
+                if (string.IsNullOrEmpty(async.webRequest.error))
+                {
+                    File.WriteAllBytes(_saveFullPath, async.webRequest.downloadHandler.data);
+                    AssetDatabase.Refresh();
+                    Selection.activeObject = AssetDatabase.LoadAssetAtPath(GlobalTools.StringConcat("Assets", _savePath, "/", _saveName, ".", _format.ToString()), typeof(AudioClip));
+                }
+                else
+                {
+                    GlobalTools.LogError("合成语音失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
+                }
+            }
+            else
+            {
+                GlobalTools.LogError("合成语音失败：错误的请求操作！");
+            }
+            _isSynthesis = false;
         }
     }
 }

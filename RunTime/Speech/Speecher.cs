@@ -1,6 +1,4 @@
-﻿using Baidu.Aip.Speech;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -16,46 +14,55 @@ namespace HT.Framework.AI
         private static string APIKEY = "";
         private static string SECRETKEY = "";
         private static string TOKEN = "";
-        private static SpeechCoroutiner Coroutiner;
-        private static Queue<Tts> Ttss = new Queue<Tts>();
-        private static Dictionary<string, object> TtsOptions = new Dictionary<string, object>()
-        {
-             {"spd", 5},
-             {"pit", 5},
-             {"vol", 15},
-             {"per", 4},
-             {"aue", 6}
-        };
 
+        /// <summary>
+        /// 设置APIKEY
+        /// </summary>
+        /// <param name="apiKey">APIKEY</param>
         public static void SetAPIKEY(string apiKey)
         {
             APIKEY = apiKey;
         }
+        /// <summary>
+        /// 设置SECRETKEY
+        /// </summary>
+        /// <param name="SecretKey">SECRETKEY</param>
         public static void SetSECRETKEY(string SecretKey)
         {
             SECRETKEY = SecretKey;
         }
+        /// <summary>
+        /// 设置TOKEN
+        /// </summary>
+        /// <param name="token">TOKEN</param>
         public static void SetTOKEN(string token)
         {
             TOKEN = token;
         }
 
-        private static Tts GetTts()
+        /// <summary>
+        /// 在线获取TOKEN
+        /// </summary>
+        /// <returns>获取TOKEN的协程</returns>
+        public static Coroutine GetTOKEN()
         {
-            Tts tts;
-            if (Ttss.Count > 0)
+            return Main.Current.StartCoroutine(GetTOKENCoroutine());
+        }
+        private static IEnumerator GetTOKENCoroutine()
+        {
+            string url = string.Format("https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id={0}&client_secret={1}", APIKEY, SECRETKEY);
+
+            UnityWebRequest request = UnityWebRequest.Get(url);
+            yield return request.SendWebRequest();
+            if (!request.isNetworkError && !request.isHttpError)
             {
-                tts = Ttss.Dequeue();
+                JsonData json = GlobalTools.StringToJson(request.downloadHandler.text);
+                TOKEN = json["access_token"].ToString();
             }
             else
             {
-                tts = new Tts(APIKEY, SECRETKEY);
+                GlobalTools.LogError("获取TOKEN失败：" + request.responseCode + " " + request.error);
             }
-            return tts;
-        }
-        private static void RecycleTts(Tts tts)
-        {
-            Ttss.Enqueue(tts);
         }
 
         /// <summary>
@@ -63,28 +70,22 @@ namespace HT.Framework.AI
         /// </summary>
         /// <param name="text">合成文本</param>
         /// <param name="handler">合成完毕后的处理者</param>
+        /// <param name="failHandler">合成失败的处理者</param>
         /// <param name="timeout">超时时长</param>
         /// <param name="speaker">发音人</param>
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
         /// <returns>合成语音的协程</returns>
-        public static Coroutine SynthesisByTOKEN(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static Coroutine Synthesis(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
-
-            if (!Coroutiner)
-            {
-                GameObject obj = new GameObject("Coroutiner");
-                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
-                Object.DontDestroyOnLoad(obj);
-            }
-
-            return Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            
+            return Main.Current.StartCoroutine(SynthesisCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
         /// 合成语音
@@ -92,31 +93,25 @@ namespace HT.Framework.AI
         /// <param name="text">合成文本</param>
         /// <param name="rule">合成规则</param>
         /// <param name="handler">合成完毕后的处理者</param>
+        /// <param name="failHandler">合成失败的处理者</param>
         /// <param name="timeout">超时时长</param>
         /// <param name="speaker">发音人</param>
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
         /// <returns>合成语音的协程</returns>
-        public static Coroutine SynthesisByTOKEN(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static Coroutine Synthesis(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
-
-            if (!Coroutiner)
-            {
-                GameObject obj = new GameObject("Coroutiner");
-                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
-                Object.DontDestroyOnLoad(obj);
-            }
-
+            
             text = rule.Apply(text);
-            return Coroutiner.StartCoroutine(SynthesisByTOKENCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            return Main.Current.StartCoroutine(SynthesisCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
         }
-        private static IEnumerator SynthesisByTOKENCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
+        private static IEnumerator SynthesisCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
             string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
                 text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, 6);
@@ -125,7 +120,7 @@ namespace HT.Framework.AI
             yield return request.SendWebRequest();
             if (!request.isNetworkError && !request.isHttpError)
             {
-                AudioClip audioClip = SpeechUtility.ToAudioClip(request.downloadHandler.data);
+                AudioClip audioClip = DownloadHandlerAudioClip.GetContent(request);
 
                 handler?.Invoke(audioClip);
             }
@@ -138,169 +133,132 @@ namespace HT.Framework.AI
         }
 
         /// <summary>
-        /// 合成语音
+        /// 合成语音，并保存语音文件
         /// </summary>
         /// <param name="text">合成文本</param>
-        /// <param name="handler">合成完毕后的处理者</param>
+        /// <param name="savePath">语音文件保存路径</param>
         /// <param name="timeout">超时时长</param>
+        /// <param name="audioType">音频文件格式</param>
         /// <param name="speaker">发音人</param>
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
         /// <returns>合成语音的协程</returns>
-        public static Coroutine SynthesisByKEY(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static Coroutine Synthesis(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
-
-            if (!Coroutiner)
-            {
-                GameObject obj = new GameObject("Coroutiner");
-                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
-                Object.DontDestroyOnLoad(obj);
-            }
-
-            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            
+            return Main.Current.StartCoroutine(SynthesisCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
         }
         /// <summary>
-        /// 合成语音
+        /// 合成语音，并保存语音文件
         /// </summary>
         /// <param name="text">合成文本</param>
         /// <param name="rule">合成规则</param>
-        /// <param name="handler">合成完毕后的处理者</param>
+        /// <param name="savePath">语音文件保存路径</param>
         /// <param name="timeout">超时时长</param>
+        /// <param name="audioType">音频文件格式</param>
         /// <param name="speaker">发音人</param>
         /// <param name="volume">音量</param>
         /// <param name="speed">音速</param>
         /// <param name="pitch">音调</param>
         /// <returns>合成语音的协程</returns>
-        public static Coroutine SynthesisByKEY(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
+        public static Coroutine Synthesis(string text, SynthesisRule rule, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
                 GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
-
-            if (!Coroutiner)
-            {
-                GameObject obj = new GameObject("Coroutiner");
-                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
-                Object.DontDestroyOnLoad(obj);
-            }
-
+            
             text = rule.Apply(text);
-            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, handler, failHandler, timeout, speaker, volume, speed, pitch));
+            return Main.Current.StartCoroutine(SynthesisCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
         }
-        private static IEnumerator SynthesisByKEYCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
+        private static IEnumerator SynthesisCoroutine(string text, string savePath, SynthesisType audioType, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
-            Tts tts = GetTts();
-            tts.Timeout = timeout;
-            TtsOptions["spd"] = Mathf.Clamp(speed, 0, 9);
-            TtsOptions["pit"] = Mathf.Clamp(pitch, 0, 9);
-            TtsOptions["vol"] = Mathf.Clamp(volume, 0, 15);
-            TtsOptions["per"] = (int)speaker;
-            TtsOptions["aue"] = 6;
-            TtsResponse response = tts.Synthesis(text, TtsOptions);
-            yield return response;
-            if (response.Success)
-            {
-                AudioClip audioClip = SpeechUtility.ToAudioClip(response.Data);
+            string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
+                text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, (int)audioType);
 
-                handler?.Invoke(audioClip);
+            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType == SynthesisType.MP3 ? AudioType.MPEG : AudioType.WAV);
+            yield return request.SendWebRequest();
+            if (!request.isNetworkError && !request.isHttpError)
+            {
+                File.WriteAllBytes(savePath, request.downloadHandler.data);
             }
             else
             {
-                GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
+                GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+            }
+        }
+
+        /// <summary>
+        /// 语音识别
+        /// </summary>
+        /// <param name="clip">语音音频</param>
+        /// <param name="handler">识别成功处理者</param>
+        /// <param name="failHandler">识别失败处理者</param>
+        /// <returns>语音识别的协程</returns>
+        public static Coroutine Recognition(AudioClip clip, HTFAction<string> handler, HTFAction failHandler)
+        {
+            if (clip == null)
+            {
+                GlobalTools.LogError("语音识别失败：语音内容为空！");
+                return null;
+            }
+
+            return Main.Current.StartCoroutine(RecognitionCoroutine(SpeechUtility.FromAudioClip(clip), handler, failHandler));
+        }
+        /// <summary>
+        /// 语音识别
+        /// </summary>
+        /// <param name="data">语音音频数据</param>
+        /// <param name="handler">识别成功处理者</param>
+        /// <param name="failHandler">识别失败处理者</param>
+        /// <returns>语音识别的协程</returns>
+        public static Coroutine Recognition(byte[] data, HTFAction<string> handler, HTFAction failHandler)
+        {
+            if (data == null || data.Length <= 0)
+            {
+                GlobalTools.LogError("语音识别失败：语音内容为空！");
+                return null;
+            }
+
+            return Main.Current.StartCoroutine(RecognitionCoroutine(data, handler, failHandler));
+        }
+        private static IEnumerator RecognitionCoroutine(byte[] data, HTFAction<string> handler, HTFAction failHandler)
+        {
+            string url = string.Format("https://vop.baidu.com/server_api?cuid={0}&token={1}", SystemInfo.deviceUniqueIdentifier, TOKEN);
+
+            WWWForm form = new WWWForm();
+            form.AddBinaryData("audio", data);
+
+            UnityWebRequest request = UnityWebRequest.Post(url, form);
+            request.SetRequestHeader("Content-Type", "audio/pcm;rate=16000");
+            yield return request.SendWebRequest();
+            if (!request.isNetworkError && !request.isHttpError)
+            {
+                JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                if ((int)jsonData["err_no"] == 0)
+                {
+                    handler?.Invoke(jsonData["result"].Count > 0 ? jsonData["result"][0].ToString() : "未识别到声音");
+                }
+                else
+                {
+                    GlobalTools.LogError("语音识别失败：" + jsonData["err_msg"].ToString());
+
+                    failHandler?.Invoke();
+                }
+            }
+            else
+            {
+                GlobalTools.LogError("语音识别失败：" + request.responseCode + " " + request.error);
 
                 failHandler?.Invoke();
             }
-            RecycleTts(tts);
-        }
-
-        /// <summary>
-        /// 合成语音，并保存语音文件
-        /// </summary>
-        /// <param name="text">合成文本</param>
-        /// <param name="savePath">语音文件保存路径</param>
-        /// <param name="timeout">超时时长</param>
-        /// <param name="audioType">音频文件格式</param>
-        /// <param name="speaker">发音人</param>
-        /// <param name="volume">音量</param>
-        /// <param name="speed">音速</param>
-        /// <param name="pitch">音调</param>
-        /// <returns>合成语音的协程</returns>
-        public static Coroutine SynthesisByKEY(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
-        {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
-            {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return null;
-            }
-
-            if (!Coroutiner)
-            {
-                GameObject obj = new GameObject("Coroutiner");
-                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
-                Object.DontDestroyOnLoad(obj);
-            }
-
-            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
-        }
-        /// <summary>
-        /// 合成语音，并保存语音文件
-        /// </summary>
-        /// <param name="text">合成文本</param>
-        /// <param name="rule">合成规则</param>
-        /// <param name="savePath">语音文件保存路径</param>
-        /// <param name="timeout">超时时长</param>
-        /// <param name="audioType">音频文件格式</param>
-        /// <param name="speaker">发音人</param>
-        /// <param name="volume">音量</param>
-        /// <param name="speed">音速</param>
-        /// <param name="pitch">音调</param>
-        /// <returns>合成语音的协程</returns>
-        public static Coroutine SynthesisByKEY(string text, SynthesisRule rule, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.Woman_DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
-        {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
-            {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
-                return null;
-            }
-
-            if (!Coroutiner)
-            {
-                GameObject obj = new GameObject("Coroutiner");
-                Coroutiner = obj.AddComponent<SpeechCoroutiner>();
-                Object.DontDestroyOnLoad(obj);
-            }
-
-            text = rule.Apply(text);
-            return Coroutiner.StartCoroutine(SynthesisByKEYCoroutine(text, savePath, audioType, timeout, speaker, volume, speed, pitch));
-        }
-        private static IEnumerator SynthesisByKEYCoroutine(string text, string savePath, SynthesisType audioType, int timeout, Speaker speaker, int volume, int speed, int pitch)
-        {
-            Tts tts = GetTts();
-            tts.Timeout = timeout;
-            TtsOptions["spd"] = Mathf.Clamp(speed, 0, 9);
-            TtsOptions["pit"] = Mathf.Clamp(pitch, 0, 9);
-            TtsOptions["vol"] = Mathf.Clamp(volume, 0, 15);
-            TtsOptions["per"] = (int)speaker;
-            TtsOptions["aue"] = (int)audioType;
-            TtsResponse response = tts.Synthesis(text, TtsOptions);
-            yield return response;
-            if (response.Success)
-            {
-                File.WriteAllBytes(savePath, response.Data);
-            }
-            else
-            {
-                GlobalTools.LogError("合成语音失败：" + response.ErrorCode + " " + response.ErrorMsg);
-            }
-            RecycleTts(tts);
         }
     }
 
@@ -312,19 +270,48 @@ namespace HT.Framework.AI
         /// <summary>
         /// 普通女声
         /// </summary>
+        [Remark("普通女声")]
         Woman = 0,
         /// <summary>
         /// 普通男声
         /// </summary>
+        [Remark("普通男声")]
         Man = 1,
         /// <summary>
-        /// 情感女声-度丫丫
+        /// 度丫丫
         /// </summary>
-        Woman_DuYaYa = 4,
+        [Remark("度丫丫")]
+        DuYaYa = 4,
         /// <summary>
-        /// 情感男声-度逍遥
+        /// 度逍遥
         /// </summary>
-        Man_DuXiaoYao = 3
+        [Remark("度逍遥")]
+        DuXiaoYao = 3,
+        /// <summary>
+        /// 度小娇
+        /// </summary>
+        [Remark("【精品发音人】度小娇")]
+        DuXiaoJiao = 5,
+        /// <summary>
+        /// 度博文
+        /// </summary>
+        [Remark("【精品发音人】度博文")]
+        DuBoWen = 106,
+        /// <summary>
+        /// 度小童
+        /// </summary>
+        [Remark("【精品发音人】度小童")]
+        DuXiaoTong = 110,
+        /// <summary>
+        /// 度小萌
+        /// </summary>
+        [Remark("【精品发音人】度小萌")]
+        DuXiaoMeng = 111,
+        /// <summary>
+        /// 度米朵
+        /// </summary>
+        [Remark("【精品发音人】度米朵")]
+        DuMiDuo = 103,
     }
 
     /// <summary>

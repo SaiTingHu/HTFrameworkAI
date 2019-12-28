@@ -28,6 +28,16 @@ namespace HT.Framework.AI
                 return Application.productName + ".HT.Framework.AI.Speech.SECRETKEY";
             }
         }
+        /// <summary>
+        /// TOKEN
+        /// </summary>
+        public static string Speech_TOKEN
+        {
+            get
+            {
+                return Application.productName + ".HT.Framework.AI.Speech.TOKEN";
+            }
+        }
         #endregion
     }
 }
