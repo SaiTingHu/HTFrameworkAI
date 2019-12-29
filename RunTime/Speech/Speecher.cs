@@ -11,6 +11,9 @@ namespace HT.Framework.AI
     /// </summary>
     public static class Speecher
     {
+        private static readonly string TOKENAPI = "https://openapi.baidu.com/oauth/2.0/token";
+        private static readonly string SynthesisAPI = "http://tsn.baidu.com/text2audio";
+        private static readonly string RecognitionAPI = "https://vop.baidu.com/server_api";
         private static string APIKEY = "";
         private static string SECRETKEY = "";
         private static string TOKEN = "";
@@ -41,27 +44,29 @@ namespace HT.Framework.AI
         }
 
         /// <summary>
-        /// 在线获取TOKEN
+        /// 生成TOKEN
         /// </summary>
-        /// <returns>获取TOKEN的协程</returns>
-        public static Coroutine GetTOKEN()
+        /// <returns>生成TOKEN的协程</returns>
+        public static Coroutine GenerateTOKEN()
         {
-            return Main.Current.StartCoroutine(GetTOKENCoroutine());
+            return Main.Current.StartCoroutine(GenerateTOKENCoroutine());
         }
-        private static IEnumerator GetTOKENCoroutine()
+        private static IEnumerator GenerateTOKENCoroutine()
         {
-            string url = string.Format("https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id={0}&client_secret={1}", APIKEY, SECRETKEY);
+            string url = string.Format("{0}?grant_type=client_credentials&client_id={1}&client_secret={2}", TOKENAPI, APIKEY, SECRETKEY);
 
-            UnityWebRequest request = UnityWebRequest.Get(url);
-            yield return request.SendWebRequest();
-            if (!request.isNetworkError && !request.isHttpError)
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                JsonData json = GlobalTools.StringToJson(request.downloadHandler.text);
-                TOKEN = json["access_token"].ToString();
-            }
-            else
-            {
-                GlobalTools.LogError("获取TOKEN失败：" + request.responseCode + " " + request.error);
+                yield return request.SendWebRequest();
+                if (!request.isNetworkError && !request.isHttpError)
+                {
+                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    TOKEN = jsonData["access_token"].ToString();
+                }
+                else
+                {
+                    GlobalTools.LogError("获取TOKEN失败：" + request.responseCode + " " + request.error);
+                }
             }
         }
 
@@ -113,22 +118,24 @@ namespace HT.Framework.AI
         }
         private static IEnumerator SynthesisCoroutine(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
-            string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
-                text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, 6);
+            string url = string.Format("{0}?tex='{1}'&tok={2}&cuid={3}&ctp={4}&lan={5}&spd={6}&pit={7}&vol={8}&per={9}&aue={10}",
+                SynthesisAPI, text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, 6);
 
-            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV);
-            yield return request.SendWebRequest();
-            if (!request.isNetworkError && !request.isHttpError)
+            using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV))
             {
-                AudioClip audioClip = DownloadHandlerAudioClip.GetContent(request);
+                yield return request.SendWebRequest();
+                if (!request.isNetworkError && !request.isHttpError)
+                {
+                    AudioClip audioClip = DownloadHandlerAudioClip.GetContent(request);
 
-                handler?.Invoke(audioClip);
-            }
-            else
-            {
-                GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+                    handler?.Invoke(audioClip);
+                }
+                else
+                {
+                    GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
 
-                failHandler?.Invoke();
+                    failHandler?.Invoke();
+                }
             }
         }
 
@@ -180,18 +187,20 @@ namespace HT.Framework.AI
         }
         private static IEnumerator SynthesisCoroutine(string text, string savePath, SynthesisType audioType, int timeout, Speaker speaker, int volume, int speed, int pitch)
         {
-            string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
-                text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, (int)audioType);
+            string url = string.Format("{0}?tex='{1}'&tok={2}&cuid={3}&ctp={4}&lan={5}&spd={6}&pit={7}&vol={8}&per={9}&aue={10}",
+                SynthesisAPI, text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, (int)audioType);
 
-            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType == SynthesisType.MP3 ? AudioType.MPEG : AudioType.WAV);
-            yield return request.SendWebRequest();
-            if (!request.isNetworkError && !request.isHttpError)
+            using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType == SynthesisType.MP3 ? AudioType.MPEG : AudioType.WAV))
             {
-                File.WriteAllBytes(savePath, request.downloadHandler.data);
-            }
-            else
-            {
-                GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+                yield return request.SendWebRequest();
+                if (!request.isNetworkError && !request.isHttpError)
+                {
+                    File.WriteAllBytes(savePath, request.downloadHandler.data);
+                }
+                else
+                {
+                    GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+                }
             }
         }
 
@@ -231,33 +240,36 @@ namespace HT.Framework.AI
         }
         private static IEnumerator RecognitionCoroutine(byte[] data, HTFAction<string> handler, HTFAction failHandler)
         {
-            string url = string.Format("https://vop.baidu.com/server_api?cuid={0}&token={1}", SystemInfo.deviceUniqueIdentifier, TOKEN);
+            string url = string.Format("{0}?cuid={1}&token={2}", RecognitionAPI, SystemInfo.deviceUniqueIdentifier, TOKEN);
 
             WWWForm form = new WWWForm();
             form.AddBinaryData("audio", data);
 
-            UnityWebRequest request = UnityWebRequest.Post(url, form);
-            request.SetRequestHeader("Content-Type", "audio/pcm;rate=16000");
-            yield return request.SendWebRequest();
-            if (!request.isNetworkError && !request.isHttpError)
+            using (UnityWebRequest request = UnityWebRequest.Post(url, form))
             {
-                JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
-                if ((int)jsonData["err_no"] == 0)
+                request.SetRequestHeader("Content-Type", "audio/pcm;rate=16000");
+                yield return request.SendWebRequest();
+                if (!request.isNetworkError && !request.isHttpError)
                 {
-                    handler?.Invoke(jsonData["result"].Count > 0 ? jsonData["result"][0].ToString() : "未识别到声音");
+                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    if ((int)jsonData["err_no"] == 0)
+                    {
+                        string text = jsonData["result"].Count > 0 ? jsonData["result"][0].ToString() : "<None>";
+                        handler?.Invoke(text);
+                    }
+                    else
+                    {
+                        GlobalTools.LogError("语音识别失败：" + jsonData["err_msg"].ToString());
+
+                        failHandler?.Invoke();
+                    }
                 }
                 else
                 {
-                    GlobalTools.LogError("语音识别失败：" + jsonData["err_msg"].ToString());
+                    GlobalTools.LogError("语音识别失败：" + request.responseCode + " " + request.error);
 
                     failHandler?.Invoke();
                 }
-            }
-            else
-            {
-                GlobalTools.LogError("语音识别失败：" + request.responseCode + " " + request.error);
-
-                failHandler?.Invoke();
             }
         }
     }

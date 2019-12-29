@@ -18,6 +18,8 @@ namespace HT.Framework.AI
             window.Show();
         }
 
+        private readonly string TOKENAPI = "https://openapi.baidu.com/oauth/2.0/token";
+        private readonly string SynthesisAPI = "http://tsn.baidu.com/text2audio";
         private string APIKEY = "";
         private string SECRETKEY = "";
         private string TOKEN = "";
@@ -100,7 +102,7 @@ namespace HT.Framework.AI
             GUI.enabled = (APIKEY != "" && SECRETKEY != "");
             if (GUILayout.Button("Generate", EditorStyles.miniButton, GUILayout.Width(60)))
             {
-                string uri = string.Format("https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id={0}&client_secret={1}", APIKEY, SECRETKEY);
+                string uri = string.Format("{0}?grant_type=client_credentials&client_id={1}&client_secret={2}", TOKENAPI, APIKEY, SECRETKEY);
                 UnityWebRequest request = UnityWebRequest.Get(uri);
                 UnityWebRequestAsyncOperation async = request.SendWebRequest();
                 async.completed += GenerateTOKENDone;
@@ -218,8 +220,8 @@ namespace HT.Framework.AI
                 return;
             }
 
-            string url = string.Format("http://tsn.baidu.com/text2audio?tex='{0}'&tok={1}&cuid={2}&ctp={3}&lan={4}&spd={5}&pit={6}&vol={7}&per={8}&aue={9}",
-                text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, (int)audioType);
+            string url = string.Format("{0}?tex='{1}'&tok={2}&cuid={3}&ctp={4}&lan={5}&spd={6}&pit={7}&vol={8}&per={9}&aue={10}",
+                SynthesisAPI, text, TOKEN, SystemInfo.deviceUniqueIdentifier, 1, "zh", speed, pitch, volume, (int)speaker, (int)audioType);
 
             UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType == SynthesisType.MP3 ? AudioType.MPEG : AudioType.WAV);
             UnityWebRequestAsyncOperation async = request.SendWebRequest();
@@ -232,10 +234,10 @@ namespace HT.Framework.AI
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
             if (async != null)
             {
-                if (string.IsNullOrEmpty(async.webRequest.error))
+                if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
                 {
-                    JsonData json = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
-                    TOKEN = json["access_token"].ToString();
+                    JsonData jsonData = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
+                    TOKEN = jsonData["access_token"].ToString();
                     EditorPrefs.SetString(EditorPrefsTableAI.Speech_TOKEN, TOKEN);
                     Repaint();
                 }
@@ -243,6 +245,7 @@ namespace HT.Framework.AI
                 {
                     GlobalTools.LogError("获取Token失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
                 }
+                async.webRequest.Dispose();
             }
             else
             {
@@ -255,7 +258,7 @@ namespace HT.Framework.AI
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
             if (async != null)
             {
-                if (string.IsNullOrEmpty(async.webRequest.error))
+                if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
                 {
                     File.WriteAllBytes(_saveFullPath, async.webRequest.downloadHandler.data);
                     AssetDatabase.Refresh();
@@ -265,6 +268,7 @@ namespace HT.Framework.AI
                 {
                     GlobalTools.LogError("合成语音失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
                 }
+                async.webRequest.Dispose();
             }
             else
             {
