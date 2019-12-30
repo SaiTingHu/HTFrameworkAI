@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace HT.Framework.AI
 {
+    [CSDNBlogURL("https://wanderer.blog.csdn.net/article/details/103761142")]
+    [GithubURL("https://github.com/SaiTingHu/HTFrameworkAI")]
     [CustomEditor(typeof(AStarGrid))]
     public sealed class AStarGridInspector : HTFEditor<AStarGrid>
     {
@@ -21,7 +23,7 @@ namespace HT.Framework.AI
             base.OnInspectorDefaultGUI();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Evaluation Type ", GUILayout.Width(100));
+            GUILayout.Label("Evaluation Type", GUILayout.Width(100));
             if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup))
             {
                 GenericMenu gm = new GenericMenu();
@@ -54,7 +56,13 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            Toggle(Target.IsIgnoreOblique, out Target.IsIgnoreOblique, "Ignore Oblique");
+            GUILayout.Label("Ignore Oblique", GUILayout.Width(100));
+            Toggle(Target.IsIgnoreOblique, out Target.IsIgnoreOblique, "");
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Auto Generate", GUILayout.Width(100));
+            Toggle(Target.IsAutoGenerate, out Target.IsAutoGenerate, "");
             GUILayout.EndHorizontal();
         }
     }

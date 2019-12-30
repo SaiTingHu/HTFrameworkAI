@@ -28,6 +28,10 @@ namespace HT.Framework.AI
         /// 是否忽略斜对角
         /// </summary>
         public bool IsIgnoreOblique = false;
+        /// <summary>
+        /// 是否自动生成网格
+        /// </summary>
+        public bool IsAutoGenerate = true;
 
         //估价算法
         private AStarEvaluation _evaluation;
@@ -69,7 +73,10 @@ namespace HT.Framework.AI
                 return;
             }
 
-            GenerateGrid();
+            if (IsAutoGenerate)
+            {
+                GenerateGrid();
+            }
         }
 
         private void OnDrawGizmos()
@@ -93,6 +100,15 @@ namespace HT.Framework.AI
                 {
                     Gizmos.color = Color.cyan;
                     Gizmos.DrawCube(_resultPath[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
+                }
+            }
+
+            if (_resultNodes != null)
+            {
+                for (int i = 0; i < _resultNodes.Count; i++)
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawCube(_resultNodes[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
                 }
             }
         }
@@ -336,6 +352,8 @@ namespace HT.Framework.AI
 
         private List<AStarNode> WalkableNodefinding(AStarNode startNode, int cost)
         {
+            IsIgnoreOblique = true;
+
             //重置起点的估价
             startNode.GCost = 0;
             startNode.HCost = 0;

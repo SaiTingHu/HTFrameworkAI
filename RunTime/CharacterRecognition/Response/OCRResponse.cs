@@ -29,10 +29,8 @@ namespace HT.Framework.AI
         /// </summary>
         public List<Word> Words { get; private set; }
 
-        public OCRResponse(string response)
+        public OCRResponse(JsonData jsonData)
         {
-            JsonData jsonData = GlobalTools.StringToJson(response);
-
             LogID = jsonData["log_id"].ToString();
             Direction = jsonData.Keys.Contains("direction") ? (DirectionType)(int)jsonData["direction"] : DirectionType.None;
             WordsCount = uint.Parse(jsonData["words_result_num"].ToString());

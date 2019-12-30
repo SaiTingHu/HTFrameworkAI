@@ -98,7 +98,17 @@ namespace HT.Framework.AI
                 yield return request.SendWebRequest();
                 if (!request.isNetworkError && !request.isHttpError)
                 {
-                    recognitionMode.SuccessHandler?.Invoke(new OCRResponse(request.downloadHandler.text));
+                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    if (jsonData.Keys.Contains("error_code"))
+                    {
+                        GlobalTools.LogError("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
+
+                        recognitionMode.FailHandler?.Invoke();
+                    }
+                    else
+                    {
+                        recognitionMode.SuccessHandler?.Invoke(new OCRResponse(jsonData));
+                    }
                 }
                 else
                 {

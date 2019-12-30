@@ -49,7 +49,7 @@ namespace HT.Framework.AI
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("About", EditorStyles.toolbarButton))
             {
-                Application.OpenURL(@"http://ai.baidu.com/");
+                Application.OpenURL(@"https://wanderer.blog.csdn.net/article/details/103764141");
             }
             if (GUILayout.Button("Console Login", EditorStyles.toolbarButton))
             {
