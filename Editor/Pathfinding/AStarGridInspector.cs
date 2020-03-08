@@ -8,7 +8,7 @@ namespace HT.Framework.AI
     [CSDNBlogURL("https://wanderer.blog.csdn.net/article/details/103761142")]
     [GithubURL("https://github.com/SaiTingHu/HTFrameworkAI")]
     [CustomEditor(typeof(AStarGrid))]
-    public sealed class AStarGridInspector : HTFEditor<AStarGrid>
+    internal sealed class AStarGridInspector : HTFEditor<AStarGrid>
     {
         protected override bool IsEnableRuntimeData
         {
