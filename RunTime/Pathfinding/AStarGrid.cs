@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo("Assembly-CSharp-Editor")]
 
 namespace HT.Framework.AI
 {
@@ -13,9 +16,9 @@ namespace HT.Framework.AI
     public sealed class AStarGrid : MonoBehaviour
     {
         /// <summary>
-        /// 估价算法类型
+        /// 估价算法类型【请勿在代码中修改】
         /// </summary>
-        public string EvaluationType = "HT.Framework.AI.AStarManhattan";
+        [SerializeField] internal string EvaluationType = "HT.Framework.AI.AStarManhattan";
         /// <summary>
         /// 网格平面的大小
         /// </summary>
