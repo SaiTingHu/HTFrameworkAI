@@ -59,8 +59,7 @@ namespace HT.Framework.AI
 
         private void Awake()
         {
-            Assembly assembly = Assembly.GetAssembly(typeof(AStarEvaluation));
-            Type type = assembly.GetType(EvaluationType);
+            Type type = GlobalTools.GetTypeInRunTimeAssemblies(EvaluationType);
             if (type != null)
             {
                 _evaluation = Activator.CreateInstance(type) as AStarEvaluation;
