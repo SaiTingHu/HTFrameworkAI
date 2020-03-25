@@ -15,7 +15,8 @@ namespace HT.Framework.AI
         /// <param name="word">文字</param>
         /// <param name="pinyin">拼音</param>
         /// <param name="tone">音标</param>
-        public void AddCustomTone(string word, string pinyin, int tone)
+        /// <param name="index">拼音对应的文字索引</param>
+        public void AddCustomTone(string word, string pinyin, int tone, int index = 0)
         {
             if (_customTones.ContainsKey(word))
             {
@@ -23,10 +24,11 @@ namespace HT.Framework.AI
                 ct.Word = word;
                 ct.Pinyin = pinyin;
                 ct.Tone = tone;
+                ct.Index = index;
             }
             else
             {
-                _customTones.Add(word, Main.m_ReferencePool.Spawn<CustomTone>().Fill(word, pinyin, tone));
+                _customTones.Add(word, Main.m_ReferencePool.Spawn<CustomTone>().Fill(word, pinyin, tone, index));
             }
         }
         /// <summary>
@@ -83,16 +85,21 @@ namespace HT.Framework.AI
             /// 音调，对应1、2、3、4声
             /// </summary>
             public int Tone;
+            /// <summary>
+            /// 拼音对应的文字索引（当文字为词语时）
+            /// </summary>
+            public int Index;
 
             public CustomTone()
             {
             }
 
-            public CustomTone Fill(string word, string pinyin, int tone)
+            public CustomTone Fill(string word, string pinyin, int tone, int index)
             {
                 Word = word;
                 Pinyin = pinyin;
                 Tone = tone;
+                Index = index;
                 return this;
             }
 
@@ -101,11 +108,16 @@ namespace HT.Framework.AI
                 Word = "";
                 Pinyin = "";
                 Tone = 1;
+                Index = 0;
             }
 
             public override string ToString()
             {
-                return Word + "(" + Pinyin + Tone.ToString() + ")";
+                if (Index < 0 || Index >= Word.Length)
+                {
+                    Index = 0;
+                }
+                return Word.Insert(Index + 1, "(" + Pinyin + Tone.ToString() + ")");
             }
         }
     }
