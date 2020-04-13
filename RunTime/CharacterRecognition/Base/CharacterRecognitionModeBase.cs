@@ -96,7 +96,9 @@ namespace HT.Framework.AI
         /// </summary>
         public enum RecognizeGranularity
         {
+            [Remark("粗糙")]
             Big,
+            [Remark("精细")]
             Small
         }
 
@@ -108,42 +110,52 @@ namespace HT.Framework.AI
             /// <summary>
             /// 中英文混合
             /// </summary>
+            [Remark("中英语混合")]
             CHN_ENG,
             /// <summary>
             /// 英文
             /// </summary>
+            [Remark("英语")]
             ENG,
             /// <summary>
             /// 日语
             /// </summary>
+            [Remark("日语")]
             JAP,
             /// <summary>
             /// 韩语
             /// </summary>
+            [Remark("韩语")]
             KOR,
             /// <summary>
             /// 法语
             /// </summary>
+            [Remark("法语")]
             FRE,
             /// <summary>
             /// 西班牙语
             /// </summary>
+            [Remark("西班牙语")]
             SPA,
             /// <summary>
             /// 葡萄牙语
             /// </summary>
+            [Remark("葡萄牙语")]
             POR,
             /// <summary>
             /// 德语
             /// </summary>
+            [Remark("德语")]
             GER,
             /// <summary>
             /// 意大利语
             /// </summary>
+            [Remark("意大利语")]
             ITA,
             /// <summary>
             /// 俄语
             /// </summary>
+            [Remark("俄语")]
             RUS
         }
     }

@@ -39,5 +39,38 @@ namespace HT.Framework.AI
             }
         }
         #endregion
+
+        #region CharacterRecognition
+        /// <summary>
+        /// APIKEY
+        /// </summary>
+        public static string CR_APIKEY
+        {
+            get
+            {
+                return Application.productName + ".HT.Framework.AI.CR.APIKEY";
+            }
+        }
+        /// <summary>
+        /// SECRETKEY
+        /// </summary>
+        public static string CR_SECRETKEY
+        {
+            get
+            {
+                return Application.productName + ".HT.Framework.AI.CR.SECRETKEY";
+            }
+        }
+        /// <summary>
+        /// TOKEN
+        /// </summary>
+        public static string CR_TOKEN
+        {
+            get
+            {
+                return Application.productName + ".HT.Framework.AI.CR.TOKEN";
+            }
+        }
+        #endregion
     }
 }

@@ -195,18 +195,7 @@ namespace HT.Framework.AI
 
             GUI.enabled = true;
         }
-
-        /// <summary>
-        /// 合成语音，并保存语音文件（编辑器内）
-        /// </summary>
-        /// <param name="text">合成文本</param>
-        /// <param name="savePath">语音文件保存路径</param>
-        /// <param name="timeout">超时时长</param>
-        /// <param name="audioType">音频文件格式</param>
-        /// <param name="speaker">发音人</param>
-        /// <param name="volume">音量</param>
-        /// <param name="speed">音速</param>
-        /// <param name="pitch">音调</param>
+        
         private void SynthesisInEditor(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
@@ -228,7 +217,6 @@ namespace HT.Framework.AI
             async.completed += SynthesisDone;
             _isSynthesis = true;
         }
-
         private void GenerateTOKENDone(AsyncOperation asyncOperation)
         {
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
@@ -252,7 +240,6 @@ namespace HT.Framework.AI
                 GlobalTools.LogError("获取Token失败：错误的请求操作！");
             }
         }
-
         private void SynthesisDone(AsyncOperation asyncOperation)
         {
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
