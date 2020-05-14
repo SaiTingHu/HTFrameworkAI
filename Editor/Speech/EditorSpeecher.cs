@@ -249,7 +249,7 @@ namespace HT.Framework.AI
                 {
                     File.WriteAllBytes(_saveFullPath, async.webRequest.downloadHandler.data);
                     AssetDatabase.Refresh();
-                    Selection.activeObject = AssetDatabase.LoadAssetAtPath(GlobalTools.StringConcat("Assets", _savePath, "/", _saveName, ".", _format.ToString()), typeof(AudioClip));
+                    Selection.activeObject = AssetDatabase.LoadAssetAtPath(StringToolkit.Concat("Assets", _savePath, "/", _saveName, ".", _format.ToString()), typeof(AudioClip));
                 }
                 else
                 {

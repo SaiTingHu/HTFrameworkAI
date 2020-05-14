@@ -27,7 +27,7 @@ namespace HT.Framework.AI
             if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup))
             {
                 GenericMenu gm = new GenericMenu();
-                List<Type> types = GlobalTools.GetTypesInRunTimeAssemblies();
+                List<Type> types = ReflectionToolkit.GetTypesInRunTimeAssemblies();
                 for (int i = 0; i < types.Count; i++)
                 {
                     if (types[i].IsSubclassOf(typeof(AStarEvaluation)))
