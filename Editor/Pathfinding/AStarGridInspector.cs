@@ -27,19 +27,19 @@ namespace HT.Framework.AI
             if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup))
             {
                 GenericMenu gm = new GenericMenu();
-                List<Type> types = ReflectionToolkit.GetTypesInRunTimeAssemblies();
+                List<Type> types = ReflectionToolkit.GetTypesInRunTimeAssemblies(type =>
+                {
+                    return type.IsSubclassOf(typeof(AStarEvaluation));
+                });
                 for (int i = 0; i < types.Count; i++)
                 {
-                    if (types[i].IsSubclassOf(typeof(AStarEvaluation)))
+                    int j = i;
+                    gm.AddItem(new GUIContent(types[j].FullName), Target.EvaluationType == types[j].FullName, () =>
                     {
-                        int j = i;
-                        gm.AddItem(new GUIContent(types[j].FullName), Target.EvaluationType == types[j].FullName, () =>
-                        {
-                            Undo.RecordObject(target, "Set Evaluation");
-                            Target.EvaluationType = types[j].FullName;
-                            HasChanged();
-                        });
-                    }
+                        Undo.RecordObject(target, "Set Evaluation");
+                        Target.EvaluationType = types[j].FullName;
+                        HasChanged();
+                    });
                 }
                 gm.ShowAsContext();
             }
