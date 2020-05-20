@@ -61,7 +61,7 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("获取TOKEN失败：" + request.responseCode + " " + request.error);
+                    Log.Error("获取TOKEN失败：" + request.responseCode + " " + request.error);
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace HT.Framework.AI
         {
             if (recognitionMode == null || recognitionMode.ImageSource == null)
             {
-                GlobalTools.LogError("文字识别失败：识别方式和识别图像源均不能为空！");
+                Log.Error("文字识别失败：识别方式和识别图像源均不能为空！");
                 return null;
             }
 
@@ -101,7 +101,7 @@ namespace HT.Framework.AI
                     JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
                     if (jsonData.Keys.Contains("error_code"))
                     {
-                        GlobalTools.LogError("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
+                        Log.Error("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
 
                         recognitionMode.FailHandler?.Invoke();
                     }
@@ -112,7 +112,7 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("文字识别失败：" + request.responseCode + " " + request.error);
+                    Log.Error("文字识别失败：" + request.responseCode + " " + request.error);
 
                     recognitionMode.FailHandler?.Invoke();
                 }

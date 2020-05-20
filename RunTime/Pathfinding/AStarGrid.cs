@@ -65,13 +65,13 @@ namespace HT.Framework.AI
                 _evaluation = Activator.CreateInstance(type) as AStarEvaluation;
                 if (_evaluation == null)
                 {
-                    GlobalTools.LogError("A*：初始化网格失败，丢失了估价算法 " + EvaluationType);
+                    Log.Error("A*：初始化网格失败，丢失了估价算法 " + EvaluationType);
                     return;
                 }
             }
             else
             {
-                GlobalTools.LogError("A*：初始化网格失败，丢失了估价算法 " + EvaluationType);
+                Log.Error("A*：初始化网格失败，丢失了估价算法 " + EvaluationType);
                 return;
             }
 
@@ -140,7 +140,7 @@ namespace HT.Framework.AI
             if (startIndex.x < 0 || startIndex.x >= _nodesWidth || startIndex.y < 0 || startIndex.y >= _nodesHeight
                 || endIndex.x < 0 || endIndex.x >= _nodesWidth || endIndex.y < 0 || endIndex.y >= _nodesHeight)
             {
-                GlobalTools.LogWarning("A*：寻路失败，起点或终点的索引超出了网格的大小！");
+                Log.Warning("A*：寻路失败，起点或终点的索引超出了网格的大小！");
                 return null;
             }
 
@@ -186,7 +186,7 @@ namespace HT.Framework.AI
         {
             if (startIndex.x < 0 || startIndex.x >= _nodesWidth || startIndex.y < 0 || startIndex.y >= _nodesHeight)
             {
-                GlobalTools.LogWarning("A*：寻可行走节点失败，起点的索引超出了网格的大小！");
+                Log.Warning("A*：寻可行走节点失败，起点的索引超出了网格的大小！");
                 return null;
             }
 
@@ -335,7 +335,7 @@ namespace HT.Framework.AI
                 }
             }
 
-            GlobalTools.LogWarning("A*：寻路失败，未找到合适的路径！");
+            Log.Warning("A*：寻路失败，未找到合适的路径！");
             return null;
         }
         

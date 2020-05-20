@@ -65,7 +65,7 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("获取TOKEN失败：" + request.responseCode + " " + request.error);
+                    Log.Error("获取TOKEN失败：" + request.responseCode + " " + request.error);
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
             
@@ -109,7 +109,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
             
@@ -132,7 +132,7 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+                    Log.Error("合成语音失败：" + request.responseCode + " " + request.error);
 
                     failHandler?.Invoke();
                 }
@@ -155,7 +155,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
             
@@ -178,7 +178,7 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
             }
             
@@ -199,7 +199,7 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("合成语音失败：" + request.responseCode + " " + request.error);
+                    Log.Error("合成语音失败：" + request.responseCode + " " + request.error);
                 }
             }
         }
@@ -215,7 +215,7 @@ namespace HT.Framework.AI
         {
             if (clip == null)
             {
-                GlobalTools.LogError("语音识别失败：语音内容为空！");
+                Log.Error("语音识别失败：语音内容为空！");
                 return null;
             }
 
@@ -232,7 +232,7 @@ namespace HT.Framework.AI
         {
             if (data == null || data.Length <= 0)
             {
-                GlobalTools.LogError("语音识别失败：语音内容为空！");
+                Log.Error("语音识别失败：语音内容为空！");
                 return null;
             }
 
@@ -259,14 +259,14 @@ namespace HT.Framework.AI
                     }
                     else
                     {
-                        GlobalTools.LogError("语音识别失败：" + jsonData["err_msg"].ToString());
+                        Log.Error("语音识别失败：" + jsonData["err_msg"].ToString());
 
                         failHandler?.Invoke();
                     }
                 }
                 else
                 {
-                    GlobalTools.LogError("语音识别失败：" + request.responseCode + " " + request.error);
+                    Log.Error("语音识别失败：" + request.responseCode + " " + request.error);
 
                     failHandler?.Invoke();
                 }

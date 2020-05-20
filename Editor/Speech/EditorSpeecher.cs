@@ -200,12 +200,12 @@ namespace HT.Framework.AI
         {
             if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
             {
-                GlobalTools.LogError("合成语音失败：文本为空或长度超出了1024字节的限制！");
+                Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
             }
             if (File.Exists(savePath))
             {
-                GlobalTools.LogError("合成语音失败：已存在音频文件 " + savePath);
+                Log.Error("合成语音失败：已存在音频文件 " + savePath);
                 return;
             }
 
@@ -231,13 +231,13 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("获取Token失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
+                    Log.Error("获取Token失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
                 }
                 async.webRequest.Dispose();
             }
             else
             {
-                GlobalTools.LogError("获取Token失败：错误的请求操作！");
+                Log.Error("获取Token失败：错误的请求操作！");
             }
         }
         private void SynthesisDone(AsyncOperation asyncOperation)
@@ -253,13 +253,13 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("合成语音失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
+                    Log.Error("合成语音失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
                 }
                 async.webRequest.Dispose();
             }
             else
             {
-                GlobalTools.LogError("合成语音失败：错误的请求操作！");
+                Log.Error("合成语音失败：错误的请求操作！");
             }
             _isSynthesis = false;
         }

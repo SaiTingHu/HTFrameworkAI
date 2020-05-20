@@ -19,7 +19,7 @@ namespace HT.Framework.AI
             headerOffset += sizeof(int);
             if (wavSize <= 0 || wavSize != dataSize)
             {
-                GlobalTools.LogError("转换AudioClip失败：未获取到有效的WAV字节数据！");
+                Log.Error("转换AudioClip失败：未获取到有效的WAV字节数据！");
                 return null;
             }
 
@@ -39,7 +39,7 @@ namespace HT.Framework.AI
             headerOffset += sizeof(int);
             if (wavSize <= 0 || wavSize != dataSize)
             {
-                GlobalTools.LogError("转换AudioClip失败：未获取到有效的WAV字节数据！");
+                Log.Error("转换AudioClip失败：未获取到有效的WAV字节数据！");
                 return null;
             }
 
@@ -64,7 +64,7 @@ namespace HT.Framework.AI
             headerOffset += sizeof(int);
             if (wavSize <= 0 || wavSize != dataSize)
             {
-                GlobalTools.LogError("转换AudioClip失败：未获取到有效的WAV字节数据！");
+                Log.Error("转换AudioClip失败：未获取到有效的WAV字节数据！");
                 return null;
             }
 
@@ -91,7 +91,7 @@ namespace HT.Framework.AI
             headerOffset += sizeof(int);
             if (wavSize <= 0 || wavSize != dataSize)
             {
-                GlobalTools.LogError("转换AudioClip失败：未获取到有效的WAV字节数据！");
+                Log.Error("转换AudioClip失败：未获取到有效的WAV字节数据！");
                 return null;
             }
 
@@ -126,7 +126,7 @@ namespace HT.Framework.AI
 
             if (count != total)
             {
-                GlobalTools.LogError("转换字节数组失败：写入的字节数组长度异常！");
+                Log.Error("转换字节数组失败：写入的字节数组长度异常！");
             }
             return count;
         }
@@ -159,7 +159,7 @@ namespace HT.Framework.AI
 
             if (count != total)
             {
-                GlobalTools.LogError("转换字节数组失败：写入的字节数组长度异常！");
+                Log.Error("转换字节数组失败：写入的字节数组长度异常！");
             }
             return count;
         }
@@ -181,14 +181,14 @@ namespace HT.Framework.AI
 
             if (count != total)
             {
-                GlobalTools.LogError("转换字节数组失败：写入的字节数组长度异常！");
+                Log.Error("转换字节数组失败：写入的字节数组长度异常！");
             }
 
             count += WriteBytesToMemoryStream(ref stream, bytes);
 
             if (bytes.Length != subchunk2Size)
             {
-                GlobalTools.LogError("转换字节数组失败：写入的字节数组长度异常！");
+                Log.Error("转换字节数组失败：写入的字节数组长度异常！");
             }
             return count;
         }
@@ -216,7 +216,7 @@ namespace HT.Framework.AI
 
             if (data.Length * x != bytes.Length)
             {
-                GlobalTools.LogError("转换字节数组失败：写入的字节数组长度异常！");
+                Log.Error("转换字节数组失败：写入的字节数组长度异常！");
             }
 
             dataStream.Dispose();
@@ -247,7 +247,7 @@ namespace HT.Framework.AI
                 case 65534:
                     return "WaveFormatExtensable";
                 default:
-                    GlobalTools.LogWarning("未知的WAV格式代码:" + code);
+                    Log.Warning("未知的WAV格式代码:" + code);
                     return "";
             }
         }
@@ -262,7 +262,7 @@ namespace HT.Framework.AI
         {
             if (!File.Exists(filePath))
             {
-                GlobalTools.LogError("加载WAV文件失败：未找到 " + filePath + " 文件！");
+                Log.Error("加载WAV文件失败：未找到 " + filePath + " 文件！");
                 return null;
             }
             byte[] fileBytes = File.ReadAllBytes(filePath);
@@ -283,7 +283,7 @@ namespace HT.Framework.AI
 
             if (audioFormatCode != 1 && audioFormatCode != 65534)
             {
-                GlobalTools.LogError("转换AudioClip失败：当前仅支持转换PCM或WAV的扩展格式！");
+                Log.Error("转换AudioClip失败：当前仅支持转换PCM或WAV的扩展格式！");
                 return null;
             }
 
@@ -309,7 +309,7 @@ namespace HT.Framework.AI
                     data = Convert32BitByteArrayToAudioClipData(fileBytes, headerOffset, subchunk2Size);
                     break;
                 default:
-                    GlobalTools.LogError("转换AudioClip失败：不支持 " + bitsPerSample + " 量化位数！");
+                    Log.Error("转换AudioClip失败：不支持 " + bitsPerSample + " 量化位数！");
                     return null;
             }
 
@@ -356,7 +356,7 @@ namespace HT.Framework.AI
             byte[] bytes = stream.ToArray();
             if (bytes.Length != fileSize)
             {
-                GlobalTools.LogError("转换字节数组失败：转换完成后的字节数组长度异常！");
+                Log.Error("转换字节数组失败：转换完成后的字节数组长度异常！");
                 return null;
             }
 

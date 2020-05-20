@@ -263,13 +263,13 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("获取Token失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
+                    Log.Error("获取Token失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
                 }
                 async.webRequest.Dispose();
             }
             else
             {
-                GlobalTools.LogError("获取Token失败：错误的请求操作！");
+                Log.Error("获取Token失败：错误的请求操作！");
             }
         }
         private void RecognitionDone(AsyncOperation asyncOperation)
@@ -282,7 +282,7 @@ namespace HT.Framework.AI
                     JsonData jsonData = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
                     if (jsonData.Keys.Contains("error_code"))
                     {
-                        GlobalTools.LogError("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
+                        Log.Error("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
                     }
                     else
                     {
@@ -298,13 +298,13 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    GlobalTools.LogError("文字识别失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
+                    Log.Error("文字识别失败：" + async.webRequest.responseCode + " " + async.webRequest.error);
                 }
                 async.webRequest.Dispose();
             }
             else
             {
-                GlobalTools.LogError("文字识别失败：错误的请求操作！");
+                Log.Error("文字识别失败：错误的请求操作！");
             }
             _isRecognition = false;
         }
