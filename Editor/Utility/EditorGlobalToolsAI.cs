@@ -13,7 +13,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 新建A*网格
         /// </summary>
-        [@MenuItem("GameObject/HTFramework.AI/A* Grid", false, 0)]
+        [@MenuItem("GameObject/HTFramework AI/A* Grid", false, 0)]
         private static void CreateAStarGrid()
         {
             GameObject aStar = new GameObject();
