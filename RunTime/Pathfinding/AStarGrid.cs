@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ namespace HT.Framework.AI
     /// A*网格
     /// </summary>
     [DisallowMultipleComponent]
-    [AddComponentMenu("HTFramework.AI/A*/A* Grid")]
+    [AddComponentMenu("HTFramework AI/A*/A* Grid")]
     public sealed class AStarGrid : MonoBehaviour
     {
         /// <summary>
