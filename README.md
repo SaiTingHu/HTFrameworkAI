@@ -10,7 +10,7 @@ HTFramework的AI模块，必须依赖于HTFramework主框架使用。
 
 - [百度AI开放平台](https://ai.baidu.com/)。
 
-- [HTFramework](https://github.com/SaiTingHu/HTFramework)。
+- [HTFramework(Latest version)](https://github.com/SaiTingHu/HTFramework)。
 
 ## 模块简介
 
