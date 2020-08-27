@@ -19,7 +19,7 @@ namespace HT.Framework.AI
         }
 
         private readonly string TOKENAPI = "https://openapi.baidu.com/oauth/2.0/token";
-        private readonly string SynthesisAPI = "http://tsn.baidu.com/text2audio";
+        private readonly string SynthesisAPI = "https://tsn.baidu.com/text2audio";
         private string APIKEY = "";
         private string SECRETKEY = "";
         private string TOKEN = "";

@@ -12,7 +12,7 @@ namespace HT.Framework.AI
     public static class Speecher
     {
         private static readonly string TOKENAPI = "https://openapi.baidu.com/oauth/2.0/token";
-        private static readonly string SynthesisAPI = "http://tsn.baidu.com/text2audio";
+        private static readonly string SynthesisAPI = "https://tsn.baidu.com/text2audio";
         private static readonly string RecognitionAPI = "https://vop.baidu.com/server_api";
         private static string APIKEY = "";
         private static string SECRETKEY = "";
