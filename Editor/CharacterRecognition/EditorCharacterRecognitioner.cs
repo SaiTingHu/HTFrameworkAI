@@ -51,8 +51,10 @@ namespace HT.Framework.AI
         private bool _isDetectDirection = false;
         private bool _isDetectLanguage = false;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+
             APIKEY = EditorPrefs.GetString(EditorPrefsTableAI.CR_APIKEY, "");
             SECRETKEY = EditorPrefs.GetString(EditorPrefsTableAI.CR_SECRETKEY, "");
             TOKEN = EditorPrefs.GetString(EditorPrefsTableAI.CR_TOKEN, "");

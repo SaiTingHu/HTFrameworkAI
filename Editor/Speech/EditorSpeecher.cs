@@ -36,8 +36,10 @@ namespace HT.Framework.AI
         private int _pitch = 5;
         private bool _isSynthesis = false;
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+
             APIKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_APIKEY, "");
             SECRETKEY = EditorPrefs.GetString(EditorPrefsTableAI.Speech_SECRETKEY, "");
             TOKEN = EditorPrefs.GetString(EditorPrefsTableAI.Speech_TOKEN, "");
