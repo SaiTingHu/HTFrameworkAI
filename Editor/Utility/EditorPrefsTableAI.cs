@@ -1,76 +1,36 @@
-﻿using UnityEngine;
-
-namespace HT.Framework.AI
+﻿namespace HT.Framework.AI
 {
     /// <summary>
     /// HT.Framework.AI编辑器配置表
     /// </summary>
     public static class EditorPrefsTableAI
     {
-        #region Speech
+        #region Editor PrefsKey
         /// <summary>
         /// APIKEY
         /// </summary>
-        public static string Speech_APIKEY
-        {
-            get
-            {
-                return Application.productName + ".HT.Framework.AI.Speech.APIKEY";
-            }
-        }
+        public static readonly string Speech_APIKEY = "HT.Framework.AI.Speech.APIKEY";
         /// <summary>
         /// SECRETKEY
         /// </summary>
-        public static string Speech_SECRETKEY
-        {
-            get
-            {
-                return Application.productName + ".HT.Framework.AI.Speech.SECRETKEY";
-            }
-        }
+        public static readonly string Speech_SECRETKEY = "HT.Framework.AI.Speech.SECRETKEY";
         /// <summary>
         /// TOKEN
         /// </summary>
-        public static string Speech_TOKEN
-        {
-            get
-            {
-                return Application.productName + ".HT.Framework.AI.Speech.TOKEN";
-            }
-        }
-        #endregion
+        public static readonly string Speech_TOKEN = "HT.Framework.AI.Speech.TOKEN";
 
-        #region CharacterRecognition
         /// <summary>
         /// APIKEY
         /// </summary>
-        public static string CR_APIKEY
-        {
-            get
-            {
-                return Application.productName + ".HT.Framework.AI.CR.APIKEY";
-            }
-        }
+        public static readonly string CR_APIKEY = "HT.Framework.AI.CR.APIKEY";
         /// <summary>
         /// SECRETKEY
         /// </summary>
-        public static string CR_SECRETKEY
-        {
-            get
-            {
-                return Application.productName + ".HT.Framework.AI.CR.SECRETKEY";
-            }
-        }
+        public static readonly string CR_SECRETKEY = "HT.Framework.AI.CR.SECRETKEY";
         /// <summary>
         /// TOKEN
         /// </summary>
-        public static string CR_TOKEN
-        {
-            get
-            {
-                return Application.productName + ".HT.Framework.AI.CR.TOKEN";
-            }
-        }
+        public static readonly string CR_TOKEN = "HT.Framework.AI.CR.TOKEN";
         #endregion
     }
 }
