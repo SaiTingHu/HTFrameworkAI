@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace HT.Framework.AI
 {
+    [GiteeURL("https://gitee.com/SaiTingHu/HTFrameworkAI")]
     [CSDNBlogURL("https://wanderer.blog.csdn.net/article/details/103761142")]
     [GithubURL("https://github.com/SaiTingHu/HTFrameworkAI")]
     [CustomEditor(typeof(AStarGrid))]
