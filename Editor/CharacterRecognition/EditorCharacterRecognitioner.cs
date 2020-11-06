@@ -51,6 +51,8 @@ namespace HT.Framework.AI
         private bool _isDetectDirection = false;
         private bool _isDetectLanguage = false;
 
+        protected override string HelpUrl => "https://wanderer.blog.csdn.net/article/details/103765003";
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -64,10 +66,6 @@ namespace HT.Framework.AI
             base.OnTitleGUI();
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("About", EditorStyles.toolbarButton))
-            {
-                Application.OpenURL(@"https://wanderer.blog.csdn.net/article/details/103765003");
-            }
             if (GUILayout.Button("Console Login", EditorStyles.toolbarButton))
             {
                 Application.OpenURL(@"https://login.bce.baidu.com/");

@@ -36,6 +36,8 @@ namespace HT.Framework.AI
         private int _pitch = 5;
         private bool _isSynthesis = false;
 
+        protected override string HelpUrl => "https://wanderer.blog.csdn.net/article/details/103764141";
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -49,10 +51,6 @@ namespace HT.Framework.AI
             base.OnTitleGUI();
 
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("About", EditorStyles.toolbarButton))
-            {
-                Application.OpenURL(@"https://wanderer.blog.csdn.net/article/details/103764141");
-            }
             if (GUILayout.Button("Console Login", EditorStyles.toolbarButton))
             {
                 Application.OpenURL(@"https://login.bce.baidu.com/");
