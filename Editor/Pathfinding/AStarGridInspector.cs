@@ -30,7 +30,7 @@ namespace HT.Framework.AI
                 GenericMenu gm = new GenericMenu();
                 List<Type> types = ReflectionToolkit.GetTypesInRunTimeAssemblies(type =>
                 {
-                    return type.IsSubclassOf(typeof(AStarEvaluation));
+                    return type.IsSubclassOf(typeof(AStarEvaluation)) && !type.IsAbstract;
                 });
                 for (int i = 0; i < types.Count; i++)
                 {
