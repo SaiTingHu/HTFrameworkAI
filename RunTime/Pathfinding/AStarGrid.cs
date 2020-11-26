@@ -12,7 +12,7 @@ namespace HT.Framework.AI
     /// </summary>
     [DisallowMultipleComponent]
     [AddComponentMenu("HTFramework AI/A* Grid")]
-    public sealed class AStarGrid : MonoBehaviour
+    public sealed class AStarGrid : HTBehaviour
     {
         /// <summary>
         /// 估价算法类型【请勿在代码中修改】
@@ -56,8 +56,10 @@ namespace HT.Framework.AI
         //寻路的关闭列表
         private HashSet<AStarNode> _closeSet = new HashSet<AStarNode>();
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             Type type = ReflectionToolkit.GetTypeInRunTimeAssemblies(EvaluationType);
             if (type != null)
             {
