@@ -24,7 +24,7 @@ namespace HT.Framework.AI
             base.OnInspectorDefaultGUI();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Evaluation Type", GUILayout.Width(100));
+            GUILayout.Label("Evaluation Type", GUILayout.Width(LabelWidth));
             if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup))
             {
                 GenericMenu gm = new GenericMenu();
@@ -47,23 +47,19 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Size", GUILayout.Width(100));
-            Vector2Field(Target.Size, out Target.Size, "");
+            Vector2Field(Target.Size, out Target.Size, "Size");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Node Radius", GUILayout.Width(100));
-            FloatField(Target.NodeRadius, out Target.NodeRadius, "");
+            FloatField(Target.NodeRadius, out Target.NodeRadius, "Node Radius");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Ignore Oblique", GUILayout.Width(100));
-            Toggle(Target.IsIgnoreOblique, out Target.IsIgnoreOblique, "");
+            Toggle(Target.IsIgnoreOblique, out Target.IsIgnoreOblique, "Ignore Oblique");
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Auto Generate", GUILayout.Width(100));
-            Toggle(Target.IsAutoGenerate, out Target.IsAutoGenerate, "");
+            Toggle(Target.IsAutoGenerate, out Target.IsAutoGenerate, "Auto Generate");
             GUILayout.EndHorizontal();
         }
     }
