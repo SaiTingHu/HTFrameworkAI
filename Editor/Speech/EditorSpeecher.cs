@@ -198,7 +198,7 @@ namespace HT.Framework.AI
         
         private void SynthesisInEditor(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            if (string.IsNullOrEmpty(text) || Encoding.UTF8.GetByteCount(text) >= 1024)
             {
                 Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return;
@@ -225,9 +225,16 @@ namespace HT.Framework.AI
                 if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
-                    TOKEN = jsonData["access_token"].ToString();
-                    EditorPrefs.SetString(EditorPrefsTableAI.Speech_TOKEN, TOKEN);
-                    Repaint();
+                    if (jsonData != null)
+                    {
+                        TOKEN = jsonData.GetValueInSafe("access_token", "");
+                        EditorPrefs.SetString(EditorPrefsTableAI.Speech_TOKEN, TOKEN);
+                        Repaint();
+                    }
+                    else
+                    {
+                        Log.Error("获取TOKEN失败：" + async.webRequest.downloadHandler.text);
+                    }
                 }
                 else
                 {

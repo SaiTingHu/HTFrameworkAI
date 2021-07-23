@@ -257,9 +257,16 @@ namespace HT.Framework.AI
                 if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
-                    TOKEN = jsonData["access_token"].ToString();
-                    EditorPrefs.SetString(EditorPrefsTableAI.CR_TOKEN, TOKEN);
-                    Repaint();
+                    if (jsonData != null)
+                    {
+                        TOKEN = jsonData.GetValueInSafe("access_token", "");
+                        EditorPrefs.SetString(EditorPrefsTableAI.CR_TOKEN, TOKEN);
+                        Repaint();
+                    }
+                    else
+                    {
+                        Log.Error("获取TOKEN失败：" + async.webRequest.downloadHandler.text);
+                    }
                 }
                 else
                 {
@@ -280,20 +287,27 @@ namespace HT.Framework.AI
                 if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
-                    if (jsonData.Keys.Contains("error_code"))
+                    if (jsonData != null)
                     {
-                        Log.Error("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
+                        if (jsonData.Keys.Contains("error_code"))
+                        {
+                            Log.Error("文字识别失败：" + jsonData.GetValueInSafe("error_code", "") + " " + jsonData.GetValueInSafe("error_msg", ""));
+                        }
+                        else
+                        {
+                            _response = new OCRResponse(jsonData);
+
+                            StringBuilder builder = new StringBuilder();
+                            for (int i = 0; i < _response.Words.Count; i++)
+                            {
+                                builder.Append(_response.Words[i].Content + "\r\n");
+                            }
+                            _result = builder.ToString();
+                        }
                     }
                     else
                     {
-                        _response = new OCRResponse(jsonData);
-
-                        StringBuilder builder = new StringBuilder();
-                        for (int i = 0; i < _response.Words.Count; i++)
-                        {
-                            builder.Append(_response.Words[i].Content + "\r\n");
-                        }
-                        _result = builder.ToString();
+                        Log.Error("文字识别失败：" + async.webRequest.downloadHandler.text);
                     }
                 }
                 else

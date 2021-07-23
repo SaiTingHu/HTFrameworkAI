@@ -57,7 +57,14 @@ namespace HT.Framework.AI
                 if (!request.isNetworkError && !request.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
-                    TOKEN = jsonData["access_token"].ToString();
+                    if (jsonData != null)
+                    {
+                        TOKEN = jsonData.GetValueInSafe("access_token", "");
+                    }
+                    else
+                    {
+                        Log.Error("获取TOKEN失败：" + request.downloadHandler.text);
+                    }
                 }
                 else
                 {
@@ -99,15 +106,24 @@ namespace HT.Framework.AI
                 if (!request.isNetworkError && !request.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
-                    if (jsonData.Keys.Contains("error_code"))
+                    if (jsonData != null)
                     {
-                        Log.Error("文字识别失败：" + jsonData["error_code"].ToString() + " " + jsonData["error_msg"].ToString());
+                        if (jsonData.Keys.Contains("error_code"))
+                        {
+                            Log.Error("文字识别失败：" + jsonData.GetValueInSafe("error_code", "") + " " + jsonData.GetValueInSafe("error_msg", ""));
 
-                        recognitionMode.FailHandler?.Invoke();
+                            recognitionMode.FailHandler?.Invoke();
+                        }
+                        else
+                        {
+                            recognitionMode.SuccessHandler?.Invoke(new OCRResponse(jsonData));
+                        }
                     }
                     else
                     {
-                        recognitionMode.SuccessHandler?.Invoke(new OCRResponse(jsonData));
+                        Log.Error("文字识别失败：" + request.downloadHandler.text);
+
+                        recognitionMode.FailHandler?.Invoke();
                     }
                 }
                 else

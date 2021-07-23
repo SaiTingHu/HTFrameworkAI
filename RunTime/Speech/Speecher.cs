@@ -61,7 +61,14 @@ namespace HT.Framework.AI
                 if (!request.isNetworkError && !request.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
-                    TOKEN = jsonData["access_token"].ToString();
+                    if (jsonData != null)
+                    {
+                        TOKEN = jsonData.GetValueInSafe("access_token", "");
+                    }
+                    else
+                    {
+                        Log.Error("获取TOKEN失败：" + request.downloadHandler.text);
+                    }
                 }
                 else
                 {
@@ -84,7 +91,7 @@ namespace HT.Framework.AI
         /// <returns>合成语音的协程</returns>
         public static Coroutine Synthesis(string text, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            if (string.IsNullOrEmpty(text) || Encoding.UTF8.GetByteCount(text) >= 1024)
             {
                 Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
@@ -107,7 +114,7 @@ namespace HT.Framework.AI
         /// <returns>合成语音的协程</returns>
         public static Coroutine Synthesis(string text, SynthesisRule rule, HTFAction<AudioClip> handler, HTFAction failHandler, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            if (string.IsNullOrEmpty(text) || Encoding.UTF8.GetByteCount(text) >= 1024)
             {
                 Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
@@ -126,9 +133,20 @@ namespace HT.Framework.AI
                 yield return request.SendWebRequest();
                 if (!request.isNetworkError && !request.isHttpError)
                 {
-                    AudioClip audioClip = DownloadHandlerAudioClip.GetContent(request);
+                    string value = Encoding.UTF8.GetString(request.downloadHandler.data);
+                    JsonData jsonData = GlobalTools.StringToJson(value);
+                    if (jsonData != null)
+                    {
+                        Log.Error("合成语音失败：" + value);
 
-                    handler?.Invoke(audioClip);
+                        handler?.Invoke(null);
+                    }
+                    else
+                    {
+                        AudioClip audioClip = DownloadHandlerAudioClip.GetContent(request);
+
+                        handler?.Invoke(audioClip);
+                    }
                 }
                 else
                 {
@@ -153,7 +171,7 @@ namespace HT.Framework.AI
         /// <returns>合成语音的协程</returns>
         public static Coroutine Synthesis(string text, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            if (string.IsNullOrEmpty(text) || Encoding.UTF8.GetByteCount(text) >= 1024)
             {
                 Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
@@ -176,7 +194,7 @@ namespace HT.Framework.AI
         /// <returns>合成语音的协程</returns>
         public static Coroutine Synthesis(string text, SynthesisRule rule, string savePath, SynthesisType audioType = SynthesisType.MP3, int timeout = 60000, Speaker speaker = Speaker.DuYaYa, int volume = 15, int speed = 5, int pitch = 5)
         {
-            if (string.IsNullOrEmpty(text) || text == "" || Encoding.Default.GetByteCount(text) >= 1024)
+            if (string.IsNullOrEmpty(text) || Encoding.UTF8.GetByteCount(text) >= 1024)
             {
                 Log.Error("合成语音失败：文本为空或长度超出了1024字节的限制！");
                 return null;
@@ -252,14 +270,21 @@ namespace HT.Framework.AI
                 if (!request.isNetworkError && !request.isHttpError)
                 {
                     JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
-                    if ((int)jsonData["err_no"] == 0)
+                    string no = jsonData != null ? jsonData.GetValueInSafe("err_no", "") : "";
+                    string msg = jsonData != null ? jsonData.GetValueInSafe("err_msg", "") : "";
+
+                    if (no == "0")
                     {
-                        string text = jsonData["result"].Count > 0 ? jsonData["result"][0].ToString() : "<None>";
+                        string text = null;
+                        if (jsonData.ContainsKey("result") && jsonData["result"].Count > 0 && jsonData["result"][0] != null)
+                        {
+                            text = jsonData["result"][0].ToString();
+                        }
                         handler?.Invoke(text);
                     }
                     else
                     {
-                        Log.Error("语音识别失败：" + jsonData["err_msg"].ToString());
+                        Log.Error("语音识别失败：" + msg);
 
                         failHandler?.Invoke();
                     }
