@@ -11,13 +11,7 @@ namespace HT.Framework.AI
     [CustomEditor(typeof(AStarGrid))]
     internal sealed class AStarGridInspector : HTFEditor<AStarGrid>
     {
-        protected override bool IsEnableRuntimeData
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected override bool IsEnableRuntimeData => false;
 
         protected override void OnInspectorDefaultGUI()
         {
@@ -25,7 +19,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Evaluation Type", GUILayout.Width(LabelWidth));
-            if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup))
+            if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup, GUILayout.Width(EditorGUIUtility.currentViewWidth - LabelWidth - 25)))
             {
                 GenericMenu gm = new GenericMenu();
                 List<Type> types = ReflectionToolkit.GetTypesInRunTimeAssemblies(type =>
@@ -46,21 +40,10 @@ namespace HT.Framework.AI
             }
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            Vector2Field(Target.Size, out Target.Size, "Size");
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            FloatField(Target.NodeRadius, out Target.NodeRadius, "Node Radius");
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            Toggle(Target.IsIgnoreOblique, out Target.IsIgnoreOblique, "Ignore Oblique");
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            Toggle(Target.IsAutoGenerate, out Target.IsAutoGenerate, "Auto Generate");
-            GUILayout.EndHorizontal();
+            PropertyField(nameof(AStarGrid.Size), "Size");
+            PropertyField(nameof(AStarGrid.NodeRadius), "Node Radius");
+            PropertyField(nameof(AStarGrid.IsIgnoreOblique), "Ignore Oblique");
+            PropertyField(nameof(AStarGrid.IsAutoGenerate), "Auto Generate");
         }
     }
 }
