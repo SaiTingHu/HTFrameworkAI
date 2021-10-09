@@ -116,7 +116,7 @@ namespace HT.Framework.AI
             GUILayout.Label("Token:", GUILayout.Width(80));
             EditorGUILayout.TextField(TOKEN);
             GUI.enabled = (APIKEY != "" && SECRETKEY != "");
-            if (GUILayout.Button("Generate", EditorStyles.miniButton, GUILayout.Width(60)))
+            if (GUILayout.Button("Generate", EditorStyles.miniButton, GUILayout.Width(70)))
             {
                 string uri = string.Format("{0}?grant_type=client_credentials&client_id={1}&client_secret={2}", TOKENAPI, APIKEY, SECRETKEY);
                 UnityWebRequest request = UnityWebRequest.Get(uri);
