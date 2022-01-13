@@ -56,7 +56,7 @@ namespace HT.Framework.AI
                 yield return request.SendWebRequest();
                 if (!request.isNetworkError && !request.isHttpError)
                 {
-                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     if (jsonData != null)
                     {
                         TOKEN = jsonData.GetValueInSafe("access_token", "");
@@ -105,7 +105,7 @@ namespace HT.Framework.AI
                 yield return request.SendWebRequest();
                 if (!request.isNetworkError && !request.isHttpError)
                 {
-                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     if (jsonData != null)
                     {
                         if (jsonData.Keys.Contains("error_code"))

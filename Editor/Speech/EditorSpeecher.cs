@@ -224,7 +224,7 @@ namespace HT.Framework.AI
             {
                 if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
                 {
-                    JsonData jsonData = GlobalTools.StringToJson(async.webRequest.downloadHandler.text);
+                    JsonData jsonData = JsonToolkit.StringToJson(async.webRequest.downloadHandler.text);
                     if (jsonData != null)
                     {
                         TOKEN = jsonData.GetValueInSafe("access_token", "");

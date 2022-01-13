@@ -60,7 +60,7 @@ namespace HT.Framework.AI
                 yield return request.SendWebRequest();
                 if (!request.isNetworkError && !request.isHttpError)
                 {
-                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     if (jsonData != null)
                     {
                         TOKEN = jsonData.GetValueInSafe("access_token", "");
@@ -134,7 +134,7 @@ namespace HT.Framework.AI
                 if (!request.isNetworkError && !request.isHttpError)
                 {
                     string value = Encoding.UTF8.GetString(request.downloadHandler.data);
-                    JsonData jsonData = GlobalTools.StringToJson(value);
+                    JsonData jsonData = JsonToolkit.StringToJson(value);
                     if (jsonData != null)
                     {
                         Log.Error("合成语音失败：" + value);
@@ -269,7 +269,7 @@ namespace HT.Framework.AI
                 yield return request.SendWebRequest();
                 if (!request.isNetworkError && !request.isHttpError)
                 {
-                    JsonData jsonData = GlobalTools.StringToJson(request.downloadHandler.text);
+                    JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     string no = jsonData != null ? jsonData.GetValueInSafe("err_no", "") : "";
                     string msg = jsonData != null ? jsonData.GetValueInSafe("err_msg", "") : "";
 
