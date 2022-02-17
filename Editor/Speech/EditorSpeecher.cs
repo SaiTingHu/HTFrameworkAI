@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 namespace HT.Framework.AI
 {
-    public sealed class EditorSpeecher : HTFEditorWindow
+    internal sealed class EditorSpeecher : HTFEditorWindow
     {
         [MenuItem("HTFramework.AI/Speech/Editor Speecher")]
         private static void OpenEditorSpeecher()

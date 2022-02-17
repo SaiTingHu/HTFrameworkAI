@@ -3,7 +3,7 @@
     /// <summary>
     /// HT.Framework.AI编辑器配置表
     /// </summary>
-    public static class EditorPrefsTableAI
+    internal static class EditorPrefsTableAI
     {
         #region Editor PrefsKey
         /// <summary>

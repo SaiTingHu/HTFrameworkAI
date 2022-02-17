@@ -1,9 +1,13 @@
 {
-    "name": "HTFramework.AI.RunTime",
+    "name": "HTFramework.AI.Editor",
     "references": [
-        "GUID:83f631a6180cc5a41982c9354b6cc704"
+        "GUID:7b65453a364e1774bb7db0e5a7454a24",
+        "GUID:83f631a6180cc5a41982c9354b6cc704",
+        "GUID:1c5ca69798d20074fb935732bf68b629"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 namespace HT.Framework.AI
 {
-    public sealed class EditorCharacterRecognitioner : HTFEditorWindow
+    internal sealed class EditorCharacterRecognitioner : HTFEditorWindow
     {
         [MenuItem("HTFramework.AI/Character Recognition/Editor Character Recognitioner")]
         private static void OpenEditorCharacterRecognitioner()
