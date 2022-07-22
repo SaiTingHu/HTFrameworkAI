@@ -34,6 +34,12 @@ namespace HT.Framework.AI
         /// 是否自动生成网格
         /// </summary>
         public bool IsAutoGenerate = true;
+#if UNITY_EDITOR
+        /// <summary>
+        /// 是否显示节点索引
+        /// </summary>
+        public bool IsShowIndex = false;
+#endif
 
         //估价算法
         private AStarEvaluation _evaluation;
@@ -84,36 +90,46 @@ namespace HT.Framework.AI
 
         private void OnDrawGizmos()
         {
+#if UNITY_EDITOR
             Gizmos.DrawWireCube(transform.position, new Vector3(Size.x, 1, Size.y));
 
             if (_nodes == null)
-            {
                 return;
-            }
 
-            foreach (AStarNode node in _nodes)
+            if (IsShowIndex)
             {
-                Gizmos.color = node.IsCanWalk ? Color.white : Color.red;
-                Gizmos.DrawCube(node.WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
-            }
-
-            if (_resultPath != null)
-            {
-                for (int i = 0; i < _resultPath.Count; i++)
+                foreach (AStarNode node in _nodes)
                 {
-                    Gizmos.color = Color.cyan;
-                    Gizmos.DrawCube(_resultPath[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
+                    UnityEditor.Handles.Label(node.WorldPoint, $"<{node.XIndex},{node.YIndex}>");
                 }
             }
-
-            if (_resultNodes != null)
+            else
             {
-                for (int i = 0; i < _resultNodes.Count; i++)
+                foreach (AStarNode node in _nodes)
                 {
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawCube(_resultNodes[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
+                    Gizmos.color = node.IsCanWalk ? Color.white : Color.red;
+                    Gizmos.DrawCube(node.WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
+                }
+
+                if (_resultPath != null)
+                {
+                    for (int i = 0; i < _resultPath.Count; i++)
+                    {
+                        Gizmos.color = Color.cyan;
+                        Gizmos.DrawCube(_resultPath[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
+                    }
+                }
+
+                if (_resultNodes != null)
+                {
+                    for (int i = 0; i < _resultNodes.Count; i++)
+                    {
+                        Gizmos.color = Color.yellow;
+                        Gizmos.DrawCube(_resultNodes[i].WorldPoint, Vector3.one * (_nodeDiameter - 0.1f));
+                    }
                 }
             }
+#endif
         }
 
         /// <summary>

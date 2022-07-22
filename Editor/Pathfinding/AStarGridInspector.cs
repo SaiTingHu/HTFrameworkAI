@@ -11,8 +11,6 @@ namespace HT.Framework.AI
     [CustomEditor(typeof(AStarGrid))]
     internal sealed class AStarGridInspector : HTFEditor<AStarGrid>
     {
-        protected override bool IsEnableRuntimeData => false;
-
         protected override void OnInspectorDefaultGUI()
         {
             base.OnInspectorDefaultGUI();
@@ -44,6 +42,12 @@ namespace HT.Framework.AI
             PropertyField(nameof(AStarGrid.NodeRadius), "Node Radius");
             PropertyField(nameof(AStarGrid.IsIgnoreOblique), "Ignore Oblique");
             PropertyField(nameof(AStarGrid.IsAutoGenerate), "Auto Generate");
+        }
+        protected override void OnInspectorRuntimeGUI()
+        {
+            base.OnInspectorRuntimeGUI();
+
+            PropertyField(nameof(AStarGrid.IsShowIndex), "Show Index");
         }
     }
 }
