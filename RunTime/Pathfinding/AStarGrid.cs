@@ -298,9 +298,12 @@ namespace HT.Framework.AI
 
         private List<AStarNode> Pathfinding(AStarNode startNode, AStarNode endNode)
         {
-            //重置起点的估价
-            startNode.GCost = 0;
-            startNode.HCost = 0;
+            //重置估价
+            foreach (var node in _nodes)
+            {
+                node.GCost = 0;
+                node.HCost = 0;
+            }
 
             _openList.Clear();
             _openSet.Clear();
@@ -330,11 +333,14 @@ namespace HT.Framework.AI
                     return GeneratePath(startNode, endNode);
                 }
 
-                //遍历当前节点的相邻节点，更新估价并加入开启列表
+                //遍历当前节点的邻居节点，更新估价并加入开启列表
                 GetNeighbor(currentNode);
                 for (int i = 0; i < _neighbors.Count; i++)
                 {
-                    if (!_neighbors[i].IsCanWalk || _closeSet.Contains(_neighbors[i]))
+                    if (!_neighbors[i].IsCanWalk)
+                        continue;
+
+                    if (_closeSet.Contains(_neighbors[i]))
                         continue;
 
                     int gCost = currentNode.GCost + _evaluation.Evaluation(currentNode, _neighbors[i]) + _neighbors[i].OCost;
@@ -353,7 +359,8 @@ namespace HT.Framework.AI
             }
 
             Log.Warning("A*：寻路失败，未找到合适的路径！");
-            return null;
+            _resultPath.Clear();
+            return _resultPath;
         }
         
         private List<AStarNode> GeneratePath(AStarNode startNode, AStarNode endNode)
@@ -373,13 +380,15 @@ namespace HT.Framework.AI
         {
             IsIgnoreOblique = true;
 
-            //重置起点的估价
-            startNode.GCost = 0;
-            startNode.HCost = 0;
+            //重置估价
+            foreach (var node in _nodes)
+            {
+                node.GCost = 0;
+                node.HCost = 0;
+            }
 
             _openList.Clear();
             _openSet.Clear();
-            _closeSet.Clear();
 
             //将开始节点加入到开启列表中
             _openList.Add(startNode);
@@ -391,49 +400,32 @@ namespace HT.Framework.AI
 
                 _openList.Remove(currentNode);
                 _openSet.Remove(currentNode);
-                _closeSet.Add(currentNode);
 
-                //遍历当前节点的相邻节点，更新估价，估价低于限制估价的加入开启列表，否则加入关闭列表
+                //遍历当前节点的邻居节点，更新估价，估价低于限制估价的加入开启列表
                 GetNeighbor(currentNode);
                 for (int i = 0; i < _neighbors.Count; i++)
                 {
-                    if (!_neighbors[i].IsCanWalk || _closeSet.Contains(_neighbors[i]))
+                    if (!_neighbors[i].IsCanWalk)
                         continue;
 
                     int gCost = currentNode.GCost + _evaluation.Evaluation(currentNode, _neighbors[i]) + _neighbors[i].OCost;
-                    if (gCost <= cost)
-                    {
-                        if (gCost < _neighbors[i].GCost || !_openSet.Contains(_neighbors[i]))
-                        {
-                            _neighbors[i].GCost = gCost;
-                            _neighbors[i].Parent = currentNode;
-                            if (!_openSet.Contains(_neighbors[i]))
-                            {
-                                _openList.Add(_neighbors[i]);
-                                _openSet.Add(_neighbors[i]);
-                            }
-                        }
-                    }
-                    else
+                    if (_neighbors[i] != startNode && gCost <= cost && (gCost < _neighbors[i].GCost || _neighbors[i].GCost == 0))
                     {
                         _neighbors[i].GCost = gCost;
-                        _neighbors[i].Parent = currentNode;
-
-                        if (_openSet.Contains(_neighbors[i]))
+                        if (!_openSet.Contains(_neighbors[i]))
                         {
-                            _openList.Remove(_neighbors[i]);
-                            _openSet.Remove(_neighbors[i]);
+                            _openList.Add(_neighbors[i]);
+                            _openSet.Add(_neighbors[i]);
                         }
-                        _closeSet.Add(_neighbors[i]);
                     }
                 }
             }
 
             //找到所有估价合格的节点
             _resultNodes.Clear();
-            foreach (AStarNode node in _closeSet)
+            foreach (AStarNode node in _nodes)
             {
-                if (node.GCost <= cost)
+                if (node.GCost != 0 && node.GCost <= cost)
                 {
                     _resultNodes.Add(node);
                 }

@@ -10,7 +10,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 节点是否可以通行
         /// </summary>
-        public bool IsCanWalk = true;
+        public bool IsCanWalk { get; set; } = true;
         /// <summary>
         /// 节点的世界坐标
         /// </summary>
@@ -26,19 +26,19 @@ namespace HT.Framework.AI
         /// <summary>
         /// 当前节点自身的固定估价
         /// </summary>
-        public int OCost = 0;
+        public int OCost { get; set; } = 0;
         /// <summary>
         /// 起始点到当前节点的估价
         /// </summary>
-        public int GCost = 0;
+        public int GCost { get; internal set; } = 0;
         /// <summary>
         /// 当前节点到终点的估价
         /// </summary>
-        public int HCost = 0;
+        public int HCost { get; internal set; } = 0;
         /// <summary>
         /// 父节点
         /// </summary>
-        public AStarNode Parent;
+        public AStarNode Parent { get; internal set; }
 
         /// <summary>
         /// 总估价
