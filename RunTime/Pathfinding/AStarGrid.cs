@@ -158,7 +158,8 @@ namespace HT.Framework.AI
                 || endIndex.x < 0 || endIndex.x >= _nodesWidth || endIndex.y < 0 || endIndex.y >= _nodesHeight)
             {
                 Log.Warning("A*：寻路失败，起点或终点的索引超出了网格的大小！");
-                return null;
+                _resultPath.Clear();
+                return _resultPath;
             }
 
             if (rule != null)
@@ -204,7 +205,8 @@ namespace HT.Framework.AI
             if (startIndex.x < 0 || startIndex.x >= _nodesWidth || startIndex.y < 0 || startIndex.y >= _nodesHeight)
             {
                 Log.Warning("A*：寻可行走节点失败，起点的索引超出了网格的大小！");
-                return null;
+                _resultNodes.Clear();
+                return _resultNodes;
             }
 
             if (rule != null)
@@ -298,6 +300,14 @@ namespace HT.Framework.AI
 
         private List<AStarNode> Pathfinding(AStarNode startNode, AStarNode endNode)
         {
+            //终点不可抵达
+            if (!endNode.IsCanWalk)
+            {
+                Log.Warning("A*：寻路失败，目标位置不可抵达！");
+                _resultPath.Clear();
+                return _resultPath;
+            }
+
             //重置估价
             foreach (var node in _nodes)
             {
