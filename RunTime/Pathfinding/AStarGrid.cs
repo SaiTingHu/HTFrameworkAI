@@ -34,6 +34,10 @@ namespace HT.Framework.AI
         /// 是否自动生成网格
         /// </summary>
         public bool IsAutoGenerate = true;
+        /// <summary>
+        /// 是否禁止显示寻路失败的日志提示
+        /// </summary>
+        public bool IsHideFindFailedLog = false;
 #if UNITY_EDITOR
         /// <summary>
         /// 是否显示节点索引
@@ -157,7 +161,7 @@ namespace HT.Framework.AI
             if (startIndex.x < 0 || startIndex.x >= _nodesWidth || startIndex.y < 0 || startIndex.y >= _nodesHeight
                 || endIndex.x < 0 || endIndex.x >= _nodesWidth || endIndex.y < 0 || endIndex.y >= _nodesHeight)
             {
-                Log.Warning("A*：寻路失败，起点或终点的索引超出了网格的大小！");
+                if (!IsHideFindFailedLog) Log.Warning("A*：寻路失败，起点或终点的索引超出了网格的大小！");
                 _resultPath.Clear();
                 return _resultPath;
             }
@@ -204,7 +208,7 @@ namespace HT.Framework.AI
         {
             if (startIndex.x < 0 || startIndex.x >= _nodesWidth || startIndex.y < 0 || startIndex.y >= _nodesHeight)
             {
-                Log.Warning("A*：寻可行走节点失败，起点的索引超出了网格的大小！");
+                if (!IsHideFindFailedLog) Log.Warning("A*：寻可行走节点失败，起点的索引超出了网格的大小！");
                 _resultNodes.Clear();
                 return _resultNodes;
             }
@@ -303,7 +307,7 @@ namespace HT.Framework.AI
             //终点不可抵达
             if (!endNode.IsCanWalk)
             {
-                Log.Warning("A*：寻路失败，目标位置不可抵达！");
+                if (!IsHideFindFailedLog) Log.Warning("A*：寻路失败，目标位置不可抵达！");
                 _resultPath.Clear();
                 return _resultPath;
             }
@@ -368,7 +372,7 @@ namespace HT.Framework.AI
                 }
             }
 
-            Log.Warning("A*：寻路失败，未找到合适的路径！");
+            if (!IsHideFindFailedLog) Log.Warning("A*：寻路失败，未找到合适的路径！");
             _resultPath.Clear();
             return _resultPath;
         }
@@ -389,6 +393,12 @@ namespace HT.Framework.AI
         private List<AStarNode> WalkableNodefinding(AStarNode startNode, int cost)
         {
             IsIgnoreOblique = true;
+
+            if (cost <= 0)
+            {
+                _resultNodes.Clear();
+                return _resultNodes;
+            }
 
             //重置估价
             foreach (var node in _nodes)

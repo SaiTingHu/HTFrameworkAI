@@ -42,6 +42,7 @@ namespace HT.Framework.AI
             PropertyField(nameof(AStarGrid.NodeRadius), "Node Radius");
             PropertyField(nameof(AStarGrid.IsIgnoreOblique), "Ignore Oblique");
             PropertyField(nameof(AStarGrid.IsAutoGenerate), "Auto Generate");
+            PropertyField(nameof(AStarGrid.IsHideFindFailedLog), "Hide Find Failed Log");
         }
         protected override void OnInspectorRuntimeGUI()
         {
