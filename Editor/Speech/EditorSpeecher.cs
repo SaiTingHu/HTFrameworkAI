@@ -8,16 +8,6 @@ namespace HT.Framework.AI
 {
     internal sealed class EditorSpeecher : HTFEditorWindow
     {
-        [MenuItem("HTFramework.AI/Speech/Editor Speecher")]
-        private static void OpenEditorSpeecher()
-        {
-            EditorSpeecher window = GetWindow<EditorSpeecher>();
-            window.titleContent.text = "Speecher";
-            window.minSize = new Vector2(400, 400);
-            window.maxSize = new Vector2(400, 400);
-            window.Show();
-        }
-
         private readonly string TOKENAPI = "https://openapi.baidu.com/oauth/2.0/token";
         private readonly string SynthesisAPI = "https://tsn.baidu.com/text2audio";
         private string APIKEY = "";

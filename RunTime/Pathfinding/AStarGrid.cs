@@ -11,7 +11,7 @@ namespace HT.Framework.AI
     /// A*网格
     /// </summary>
     [DisallowMultipleComponent]
-    [AddComponentMenu("HTFramework AI/A* Grid")]
+    [AddComponentMenu("HTFramework/★ AI/A* Grid")]
     public sealed class AStarGrid : HTBehaviour
     {
         /// <summary>

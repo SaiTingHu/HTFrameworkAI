@@ -8,16 +8,6 @@ namespace HT.Framework.AI
 {
     internal sealed class EditorCharacterRecognitioner : HTFEditorWindow
     {
-        [MenuItem("HTFramework.AI/Character Recognition/Editor Character Recognitioner")]
-        private static void OpenEditorCharacterRecognitioner()
-        {
-            EditorCharacterRecognitioner window = GetWindow<EditorCharacterRecognitioner>();
-            window.titleContent.text = "Character Recognitioner";
-            window.minSize = new Vector2(400, 400);
-            window.maxSize = new Vector2(400, 400);
-            window.Show();
-        }
-
         private readonly string[] Modes = new string[] {
             "通用",
             "通用（含位置信息）",
