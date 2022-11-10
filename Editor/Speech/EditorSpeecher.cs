@@ -88,7 +88,12 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Token:", GUILayout.Width(80));
-            EditorGUILayout.TextField(TOKEN);
+            string token = EditorGUILayout.TextField(TOKEN);
+            if (token != TOKEN)
+            {
+                TOKEN = token;
+                EditorPrefs.SetString(EditorPrefsTableAI.Speech_TOKEN, TOKEN);
+            }
             GUI.enabled = (APIKEY != "" && SECRETKEY != "");
             if (GUILayout.Button("Generate", EditorStyles.miniButton, GUILayout.Width(70)))
             {
