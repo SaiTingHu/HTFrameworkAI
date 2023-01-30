@@ -58,7 +58,7 @@ namespace HT.Framework.AI
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                if (!request.isNetworkError && !request.isHttpError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     if (jsonData != null)
@@ -131,7 +131,7 @@ namespace HT.Framework.AI
             using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV))
             {
                 yield return request.SendWebRequest();
-                if (!request.isNetworkError && !request.isHttpError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     string value = Encoding.UTF8.GetString(request.downloadHandler.data);
                     JsonData jsonData = JsonToolkit.StringToJson(value);
@@ -211,7 +211,7 @@ namespace HT.Framework.AI
             using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, audioType == SynthesisType.MP3 ? AudioType.MPEG : AudioType.WAV))
             {
                 yield return request.SendWebRequest();
-                if (!request.isNetworkError && !request.isHttpError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     File.WriteAllBytes(savePath, request.downloadHandler.data);
                 }
@@ -267,7 +267,7 @@ namespace HT.Framework.AI
             {
                 request.SetRequestHeader("Content-Type", "audio/pcm;rate=16000");
                 yield return request.SendWebRequest();
-                if (!request.isNetworkError && !request.isHttpError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     string no = jsonData != null ? jsonData.GetValueInSafe("err_no", "") : "";

@@ -54,7 +54,7 @@ namespace HT.Framework.AI
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
                 yield return request.SendWebRequest();
-                if (!request.isNetworkError && !request.isHttpError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     if (jsonData != null)
@@ -103,7 +103,7 @@ namespace HT.Framework.AI
             {
                 request.SetRequestHeader("Content-Type", recognitionMode.ContentType);
                 yield return request.SendWebRequest();
-                if (!request.isNetworkError && !request.isHttpError)
+                if (request.result == UnityWebRequest.Result.Success)
                 {
                     JsonData jsonData = JsonToolkit.StringToJson(request.downloadHandler.text);
                     if (jsonData != null)
