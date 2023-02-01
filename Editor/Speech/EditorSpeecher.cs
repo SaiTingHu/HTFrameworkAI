@@ -217,7 +217,7 @@ namespace HT.Framework.AI
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
             if (async != null)
             {
-                if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
+                if (async.webRequest.result == UnityWebRequest.Result.Success)
                 {
                     JsonData jsonData = JsonToolkit.StringToJson(async.webRequest.downloadHandler.text);
                     if (jsonData != null)
@@ -247,7 +247,7 @@ namespace HT.Framework.AI
             UnityWebRequestAsyncOperation async = asyncOperation as UnityWebRequestAsyncOperation;
             if (async != null)
             {
-                if (!async.webRequest.isNetworkError && !async.webRequest.isHttpError)
+                if (async.webRequest.result == UnityWebRequest.Result.Success)
                 {
                     File.WriteAllBytes(_saveFullPath, async.webRequest.downloadHandler.data);
                     AssetDatabase.Refresh();
