@@ -219,7 +219,7 @@ namespace HT.Framework.AI
                 Log.Error("转换字节数组失败：写入的字节数组长度异常！");
             }
 
-            dataStream.Dispose();
+            dataStream.Close();
 
             return bytes;
         }
@@ -366,7 +366,7 @@ namespace HT.Framework.AI
                 File.WriteAllBytes(filepath, bytes);
             }
 
-            stream.Dispose();
+            stream.Close();
             return bytes;
         }
     }
