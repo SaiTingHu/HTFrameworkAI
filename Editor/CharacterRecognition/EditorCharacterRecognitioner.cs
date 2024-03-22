@@ -287,12 +287,12 @@ namespace HT.Framework.AI
                         {
                             _response = new OCRResponse(jsonData);
 
-                            StringBuilder builder = new StringBuilder();
+                            StringToolkit.BeginConcat();
                             for (int i = 0; i < _response.Words.Count; i++)
                             {
-                                builder.Append(_response.Words[i].Content + "\r\n");
+                                StringToolkit.Concat(_response.Words[i].Content, true);
                             }
-                            _result = builder.ToString();
+                            _result = StringToolkit.EndConcat();
                         }
                     }
                     else
