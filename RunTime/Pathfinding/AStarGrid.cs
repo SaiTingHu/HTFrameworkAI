@@ -70,7 +70,7 @@ namespace HT.Framework.AI
         {
             base.Awake();
 
-            Type type = ReflectionToolkit.GetTypeInRunTimeAssemblies(EvaluationType);
+            Type type = ReflectionToolkit.GetTypeInRunTimeAssemblies(EvaluationType, false);
             if (type != null)
             {
                 _evaluation = Activator.CreateInstance(type) as AStarEvaluation;

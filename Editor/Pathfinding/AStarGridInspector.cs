@@ -23,7 +23,7 @@ namespace HT.Framework.AI
                 List<Type> types = ReflectionToolkit.GetTypesInRunTimeAssemblies(type =>
                 {
                     return type.IsSubclassOf(typeof(AStarEvaluation)) && !type.IsAbstract;
-                });
+                }, false);
                 for (int i = 0; i < types.Count; i++)
                 {
                     int j = i;
