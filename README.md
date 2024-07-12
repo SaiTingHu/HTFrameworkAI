@@ -4,7 +4,7 @@ HTFramework的AI模块，必须依赖于HTFramework主框架使用。
 
 ## 环境
 
-- Unity版本：2022.3.17。
+- Unity版本：2022.3.34。
 
 - .NET API版本：.NET Framework。
 
