@@ -13,7 +13,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 打开 Assistant Window
         /// </summary>
-        [MenuItem("HTFramework/★ AI/Assistant", false, 200)]
+        [MenuItem("HTFramework/★ AI/Assistant &A", false, 200)]
         private static void OpenAssistantWindow()
         {
             AssistantWindow.OpenWindow(null);
@@ -22,7 +22,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 打开 Editor Character Recognitioner
         /// </summary>
-        [MenuItem("HTFramework/★ AI/Editor Character Recognitioner", false, 220)]
+        [MenuItem("HTFramework/★ AI/Character Recognitioner", false, 220)]
         private static void OpenEditorCharacterRecognitioner()
         {
             EditorCharacterRecognitioner window = EditorWindow.GetWindow<EditorCharacterRecognitioner>();
@@ -35,7 +35,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 打开 Editor Speecher
         /// </summary>
-        [MenuItem("HTFramework/★ AI/Editor Speecher", false, 221)]
+        [MenuItem("HTFramework/★ AI/Speecher", false, 221)]
         private static void OpenEditorSpeecher()
         {
             EditorSpeecher window = EditorWindow.GetWindow<EditorSpeecher>();
