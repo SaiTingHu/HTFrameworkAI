@@ -54,6 +54,7 @@ namespace HT.Framework.AI
         private Rect _sessionRect;
 
         protected override bool IsEnableTitleGUI => true;
+        protected override string HelpUrl => "https://wanderer.blog.csdn.net/article/details/145637201";
 
         protected override void OnEnable()
         {
