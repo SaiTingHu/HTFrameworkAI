@@ -11,9 +11,18 @@ namespace HT.Framework.AI
     {
         #region AI 【优先级200】
         /// <summary>
+        /// 打开 Assistant Window
+        /// </summary>
+        [MenuItem("HTFramework/★ AI/Assistant", false, 200)]
+        private static void OpenAssistantWindow()
+        {
+            AssistantWindow.OpenWindow(null);
+        }
+
+        /// <summary>
         /// 打开 Editor Character Recognitioner
         /// </summary>
-        [MenuItem("HTFramework/★ AI/Editor Character Recognitioner", false, 200)]
+        [MenuItem("HTFramework/★ AI/Editor Character Recognitioner", false, 220)]
         private static void OpenEditorCharacterRecognitioner()
         {
             EditorCharacterRecognitioner window = EditorWindow.GetWindow<EditorCharacterRecognitioner>();
@@ -26,7 +35,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 打开 Editor Speecher
         /// </summary>
-        [MenuItem("HTFramework/★ AI/Editor Speecher", false, 201)]
+        [MenuItem("HTFramework/★ AI/Editor Speecher", false, 221)]
         private static void OpenEditorSpeecher()
         {
             EditorSpeecher window = EditorWindow.GetWindow<EditorSpeecher>();
@@ -34,6 +43,23 @@ namespace HT.Framework.AI
             window.minSize = new Vector2(400, 400);
             window.maxSize = new Vector2(400, 400);
             window.Show();
+        }
+
+        [MenuItem("CONTEXT/Component/★ Ask AI Assistant")]
+        public static void AskAIAssistantComponent(MenuCommand cmd)
+        {
+            if (cmd.context is Component)
+            {
+                if (cmd.context is MonoBehaviour)
+                {
+                    Log.Warning("继承至 MonoBehaviour 的脚本不支持 Ask AI Assistant。");
+                }
+                else
+                {
+                    Component component = cmd.context as Component;
+                    AssistantWindow.OpenWindow($"Unity引擎中{component.GetType().Name}组件的参数及用法？");
+                }
+            }
         }
         #endregion
 
