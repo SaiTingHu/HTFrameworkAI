@@ -8,8 +8,6 @@ HTFramework的AI模块，必须依赖于HTFramework主框架使用。
 
 - .NET API版本：.NET Framework。
 
-- [百度AI开放平台](https://ai.baidu.com/)。
-
 - [HTFramework(Latest version)](https://github.com/SaiTingHu/HTFramework)。
 
 ## 模块简介
