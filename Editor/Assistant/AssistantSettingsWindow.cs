@@ -40,7 +40,6 @@ namespace HT.Framework.AI
             AssistantSettingsWindow window = GetWindow<AssistantSettingsWindow>();
             window.titleContent.text = "Assistant Settings";
             window._assistantWindow = assistantWindow;
-            window.position = new Rect(assistantWindow.position.center - new Vector2(150, 120), new Vector2(300, 240));
             window.minSize = new Vector2(300, 240);
             window.maxSize = new Vector2(300, 240);
             window.Show();

@@ -41,6 +41,7 @@ namespace HT.Framework.AI
         private GUIContent _userGC;
         private GUIContent _favoriteGC;
         private GUIContent _settingsGC;
+        private GUIContent _promptWordGC;
         private GUIContent _deleteGC;
         private GUIContent _foldGC;
         private GUIContent _noFoldGC;
@@ -75,6 +76,9 @@ namespace HT.Framework.AI
             _settingsGC = new GUIContent();
             _settingsGC.image = EditorGUIUtility.IconContent("d_SettingsIcon").image;
             _settingsGC.tooltip = "Settings";
+            _promptWordGC = new GUIContent();
+            _promptWordGC.image = EditorGUIUtility.IconContent("Profiler.Memory").image;
+            _promptWordGC.tooltip = "设置智能体提示词";
             _deleteGC = new GUIContent();
             _deleteGC.image = EditorGUIUtility.IconContent("TreeEditor.Trash").image;
             _deleteGC.tooltip = "删除此会话";
@@ -192,7 +196,7 @@ namespace HT.Framework.AI
             {
                 if (_currentSession == i) GUILayout.BeginHorizontal("InsertionMarker");
                 else GUILayout.BeginHorizontal();
-                if (GUILayout.Button(_sessions[i].Name, EditorStyles.label, GUILayout.MinWidth(160), GUILayout.Height(24)))
+                if (GUILayout.Button(_sessions[i].Name, EditorStyles.label, GUILayout.MinWidth(150), GUILayout.Height(24)))
                 {
                     if (_currentSession == i)
                     {
@@ -205,7 +209,13 @@ namespace HT.Framework.AI
                     GUI.FocusControl(null);
                 }
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button(_deleteGC, EditorGlobalTools.Styles.InvisibleButton, GUILayout.Width(30), GUILayout.Height(30)))
+                GUI.color = string.IsNullOrEmpty(_sessions[i].PromptWords.Content) ? Color.gray : Color.white;
+                if (GUILayout.Button(_promptWordGC, EditorGlobalTools.Styles.InvisibleButton, GUILayout.Width(20), GUILayout.Height(30)))
+                {
+                    AssistantPromptWordWindow.OpenWindow(this, _sessions[i]);
+                }
+                GUI.color = Color.white;
+                if (GUILayout.Button(_deleteGC, EditorGlobalTools.Styles.InvisibleButton, GUILayout.Width(20), GUILayout.Height(30)))
                 {
                     ChatSession chatSession = _sessions[i];
                     if (EditorUtility.DisplayDialog("删除会话", $"是否确认删除会话【{chatSession.Name}】？", "是的", "我再想想"))
@@ -233,7 +243,19 @@ namespace HT.Framework.AI
 
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                GUILayout.Label(chatSession.Name, "WarningOverlay", GUILayout.ExpandWidth(true));
+                if (GUILayout.Button(chatSession.Name, "WarningOverlay", GUILayout.ExpandWidth(true)))
+                {
+                    GenericMenu gm = new GenericMenu();
+                    gm.AddItem(new GUIContent("重命名"), false, () =>
+                    {
+                        AssistantRenameWindow.OpenWindow(this, chatSession);
+                    });
+                    gm.AddItem(new GUIContent("清空记录"), false, () =>
+                    {
+                        chatSession.Messages.Clear();
+                    });
+                    gm.ShowAsContext();
+                }
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
@@ -439,6 +461,7 @@ namespace HT.Framework.AI
                                 SendMessage(_userContent);
                                 _userContent = null;
                                 _sessionScroll = _sessionRect.position;
+                                GUI.FocusControl(null);
                                 Repaint();
                             }
                             break;

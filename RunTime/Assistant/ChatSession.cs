@@ -47,6 +47,10 @@ namespace HT.Framework.AI
         /// </summary>
         public ChatData Data = new ChatData();
         /// <summary>
+        /// 提示词
+        /// </summary>
+        public ChatMessage PromptWords = new ChatMessage() { Role = "system" };
+        /// <summary>
         /// 会话消息记录
         /// </summary>
         public List<ChatMessage> Messages = new List<ChatMessage>();
@@ -65,6 +69,16 @@ namespace HT.Framework.AI
         {
             ID = id;
             Name = name;
+        }
+
+        /// <summary>
+        /// 设置提示词
+        /// </summary>
+        /// <param name="content">提示词内容</param>
+        public void SetPromptWords(string content)
+        {
+            PromptWords.Role = "system";
+            PromptWords.Content = string.IsNullOrEmpty(content) ? content : content.Trim();
         }
         /// <summary>
         /// 用户说话
@@ -193,6 +207,10 @@ namespace HT.Framework.AI
         private string BuildChatPrompt()
         {
             StringToolkit.BeginConcat();
+            if (!string.IsNullOrEmpty(PromptWords.Content))
+            {
+                StringToolkit.Concat($"{PromptWords.Role}: {PromptWords.Content}", true);
+            }
             int i = Messages.Count - Round;
             if (i < 0) i = 0;
             for (; i < Messages.Count; i++)
