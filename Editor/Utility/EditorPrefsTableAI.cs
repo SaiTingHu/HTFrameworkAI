@@ -64,6 +64,10 @@
         /// AI助手的 ShowThink 配置
         /// </summary>
         public static readonly string Assistant_ShowThink = "HT.Framework.AI.Assistant.ShowThink";
+        /// <summary>
+        /// AI助手的 SavePath 配置
+        /// </summary>
+        public static readonly string Assistant_SavePath = "HT.Framework.AI.Assistant.SavePath";
         #endregion
     }
 }

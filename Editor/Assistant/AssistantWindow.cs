@@ -480,9 +480,7 @@ namespace HT.Framework.AI
 
             _isLoaded = true;
 
-            string rootPath = PathToolkit.ProjectPath + "Library/Assistant/";
-            if (!Directory.Exists(rootPath)) Directory.CreateDirectory(rootPath);
-
+            string rootPath = GetSavePath();
             DirectoryInfo directoryInfo = new DirectoryInfo(rootPath);
             FileSystemInfo[] infos = directoryInfo.GetFileSystemInfos();
             for (int i = 0; i < infos.Length; i++)
@@ -505,15 +503,38 @@ namespace HT.Framework.AI
         /// </summary>
         private void SaveSessions()
         {
-            string rootPath = PathToolkit.ProjectPath + "Library/Assistant/";
-            if (!Directory.Exists(rootPath)) Directory.CreateDirectory(rootPath);
-
+            string rootPath = GetSavePath();
             for (int i = 0; i < _sessions.Count; i++)
             {
                 string content = JsonToolkit.JsonToString(_sessions[i]);
                 File.WriteAllText($"{rootPath}{_sessions[i].ID}.session", content);
             }
         }
+        /// <summary>
+        /// 获取会话数据存储路径
+        /// </summary>
+        private string GetSavePath()
+        {
+            string savePath = null;
+            AssistantSessionSavePath savePathType = (AssistantSessionSavePath)EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_SavePath, 0);
+            if (savePathType == AssistantSessionSavePath.LocalAppData)
+            {
+                savePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\UnityAssistant\\";
+            }
+            else if (savePathType == AssistantSessionSavePath.Library)
+            {
+                savePath = PathToolkit.ProjectPath + "Library/Assistant/";
+            }
+            else
+            {
+                savePath = PathToolkit.ProjectPath + "Library/Assistant/";
+            }
+
+            if (!Directory.Exists(savePath)) Directory.CreateDirectory(savePath);
+
+            return savePath;
+        }
+
         /// <summary>
         /// 创建新的会话
         /// </summary>
@@ -547,9 +568,7 @@ namespace HT.Framework.AI
             _sessions.Remove(chatSession);
             _currentSession = -1;
 
-            string rootPath = PathToolkit.ProjectPath + "Library/Assistant/";
-            if (!Directory.Exists(rootPath)) Directory.CreateDirectory(rootPath);
-
+            string rootPath = GetSavePath();
             string path = $"{rootPath}{chatSession.ID}.session";
             if (File.Exists(path))
             {

@@ -40,8 +40,8 @@ namespace HT.Framework.AI
             AssistantSettingsWindow window = GetWindow<AssistantSettingsWindow>();
             window.titleContent.text = "Assistant Settings";
             window._assistantWindow = assistantWindow;
-            window.minSize = new Vector2(300, 240);
-            window.maxSize = new Vector2(300, 240);
+            window.minSize = new Vector2(300, 250);
+            window.maxSize = new Vector2(300, 250);
             window.Show();
         }
         [DllImport("user32.dll")]
@@ -58,6 +58,7 @@ namespace HT.Framework.AI
         private int _round;
         private bool _isLogInEditor;
         private bool _isShowThink;
+        private AssistantSessionSavePath _savePath;
 
         protected override void OnEnable()
         {
@@ -75,6 +76,7 @@ namespace HT.Framework.AI
             _round = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Round, 7);
             _isLogInEditor = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, false);
             _isShowThink = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_ShowThink, false);
+            _savePath = (AssistantSessionSavePath)EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_SavePath, 0);
         }
         protected override void OnBodyGUI()
         {
@@ -138,6 +140,11 @@ namespace HT.Framework.AI
             _isShowThink = EditorGUILayout.Toggle(_isShowThink);
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("数据存储路径", GUILayout.Width(100));
+            _savePath = (AssistantSessionSavePath)EditorGUILayout.EnumPopup(_savePath);
+            GUILayout.EndHorizontal();
+
             GUILayout.Space(10);
 
             GUILayout.FlexibleSpace();
@@ -165,6 +172,7 @@ namespace HT.Framework.AI
                 EditorPrefs.SetInt(EditorPrefsTableAI.Assistant_Round, _round);
                 EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, _isLogInEditor);
                 EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_ShowThink, _isShowThink);
+                EditorPrefs.SetInt(EditorPrefsTableAI.Assistant_SavePath, (int)_savePath);
                 _assistantWindow.ApplySettings();
                 Close();
             }
@@ -208,5 +216,14 @@ namespace HT.Framework.AI
             keybd_event(VK_RETURN, 0x45, KEYEVENTF_EXTENDEDKEY, 0);
             keybd_event(VK_RETURN, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
         }
+    }
+
+    /// <summary>
+    /// 会话数据存储路径
+    /// </summary>
+    public enum AssistantSessionSavePath
+    {
+        LocalAppData = 0,
+        Library = 1
     }
 }
