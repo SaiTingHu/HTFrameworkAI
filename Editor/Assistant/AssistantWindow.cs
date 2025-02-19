@@ -506,6 +506,7 @@ namespace HT.Framework.AI
             string rootPath = GetSavePath();
             for (int i = 0; i < _sessions.Count; i++)
             {
+                _sessions[i].Data.Prompt = "";
                 string content = JsonToolkit.JsonToString(_sessions[i]);
                 File.WriteAllText($"{rootPath}{_sessions[i].ID}.session", content);
             }
