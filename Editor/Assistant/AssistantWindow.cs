@@ -245,16 +245,19 @@ namespace HT.Framework.AI
                 GUILayout.FlexibleSpace();
                 if (GUILayout.Button(chatSession.Name, "WarningOverlay", GUILayout.ExpandWidth(true)))
                 {
-                    GenericMenu gm = new GenericMenu();
-                    gm.AddItem(new GUIContent("重命名"), false, () =>
+                    if (!_isReplying)
                     {
-                        AssistantRenameWindow.OpenWindow(this, chatSession);
-                    });
-                    gm.AddItem(new GUIContent("清空记录"), false, () =>
-                    {
-                        chatSession.Messages.Clear();
-                    });
-                    gm.ShowAsContext();
+                        GenericMenu gm = new GenericMenu();
+                        gm.AddItem(new GUIContent("重命名"), false, () =>
+                        {
+                            AssistantRenameWindow.OpenWindow(this, chatSession);
+                        });
+                        gm.AddItem(new GUIContent("清空记录"), false, () =>
+                        {
+                            chatSession.Messages.Clear();
+                        });
+                        gm.ShowAsContext();
+                    }
                 }
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
@@ -335,10 +338,8 @@ namespace HT.Framework.AI
             GUI.enabled = !string.IsNullOrEmpty(_userContent) && !_isReplying;
             if (GUILayout.Button("发送消息", EditorGlobalTools.Styles.LargeButton))
             {
-                if (_currentSession == -1) CreateSession(_userContent);
-                SendMessage(_userContent);
-                _userContent = null;
-                _sessionScroll = _sessionRect.position;
+                SendMessage();
+                ToSessionScrollBottom();
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
@@ -457,17 +458,19 @@ namespace HT.Framework.AI
                         case KeyCode.KeypadEnter:
                             if (!string.IsNullOrEmpty(_userContent) && !_isReplying)
                             {
-                                if (_currentSession == -1) CreateSession(_userContent);
-                                SendMessage(_userContent);
-                                _userContent = null;
-                                _sessionScroll = _sessionRect.position;
+                                SendMessage();
+                                EditorApplication.delayCall += ToSessionScrollBottom;
                                 GUI.FocusControl(null);
-                                Repaint();
                             }
                             break;
                     }
                     break;
             }
+        }
+        private void ToSessionScrollBottom()
+        {
+            _sessionScroll = _sessionRect.position;
+            Repaint();
         }
 
         /// <summary>
@@ -613,10 +616,10 @@ namespace HT.Framework.AI
         /// <summary>
         /// 发送消息（当前会话）
         /// </summary>
-        private void SendMessage(string content)
+        private void SendMessage()
         {
             if (_currentSession == -1)
-                return;
+                CreateSession(_userContent);
 
             if (_replyBuffer == null) _replyBuffer = new StringBuilder();
             else _replyBuffer.Clear();
@@ -624,7 +627,7 @@ namespace HT.Framework.AI
             _isReplying = true;
             _assistantContent = null;
 
-            _sessions[_currentSession].UserSpeak(content,
+            _sessions[_currentSession].UserSpeak(_userContent,
             (reply) =>
             {
                 if (reply == "<think>") _replyBuffer.Append("<开始推理>：");
@@ -643,6 +646,7 @@ namespace HT.Framework.AI
                 Focus();
                 Repaint();
             });
+            _userContent = null;
         }
     }
 }
