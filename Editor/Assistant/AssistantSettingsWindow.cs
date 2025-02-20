@@ -14,7 +14,7 @@ namespace HT.Framework.AI
         private const byte VK_CONTROL = 0x11;
         private const byte VK_V = 0x56;
         private const byte VK_RETURN = 0x0D;
-        private static string[] AllModels = new string[] { 
+        private static string[] DeepSeekModels = new string[] { 
             "deepseek-r1:1.5b"
             , "deepseek-r1:7b"
             , "deepseek-r1:8b"
@@ -34,14 +34,41 @@ namespace HT.Framework.AI
             , "deepseek-llm:7b"
             , "deepseek-llm:67b"
         };
+        private static string[] GLMModels = new string[] {
+            "glm4:9b"
+        };
+        private static string[] QwenModels = new string[] {
+            "qwen:14b"
+            , "qwen2:7b"
+            , "qwen2.5:14b"
+        };
+        private static string[] PhiModels = new string[] {
+            "phi3:3.8b"
+            , "phi3:14b"
+            , "phi4:14b"
+        };
+        private static string[] LlamaModels = new string[] {
+            "llama3.1:8b"
+            , "llama3.2:1b"
+            , "llama3.2:3b"
+            , "llama3.3:70b"
+        };
+        private static string[] MistralModels = new string[] {
+            "mistral:7b"
+        };
+        private static string[] GemmaModels = new string[] {
+            "gemma:7b"
+            , "gemma2:9b"
+            , "gemma2:27b"
+        };
 
         public static void OpenWindow(AssistantWindow assistantWindow)
         {
             AssistantSettingsWindow window = GetWindow<AssistantSettingsWindow>();
             window.titleContent.text = "Assistant Settings";
             window._assistantWindow = assistantWindow;
-            window.minSize = new Vector2(300, 250);
-            window.maxSize = new Vector2(300, 250);
+            window.minSize = new Vector2(300, 280);
+            window.maxSize = new Vector2(300, 280);
             window.Show();
         }
         [DllImport("user32.dll")]
@@ -67,7 +94,6 @@ namespace HT.Framework.AI
             _ollamaIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/HTFrameworkAI/Editor/Assistant/Texture/OllamaIcon.png");
             _ollamaGC = new GUIContent();
             _ollamaGC.image = _ollamaIcon;
-            _ollamaGC.text = "Run In Ollama";
             _model = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_Model, "deepseek-coder-v2:16b");
             _stream = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_Stream, true);
             _baseAddress = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_BaseAddress, "http://localhost:11434");
@@ -88,14 +114,13 @@ namespace HT.Framework.AI
             if (GUILayout.Button("选择", EditorStyles.popup))
             {
                 GenericMenu gm = new GenericMenu();
-                for (int i = 0; i < AllModels.Length; i++)
-                {
-                    string model = AllModels[i];
-                    gm.AddItem(new GUIContent(model), model == _model, () =>
-                    {
-                        _model = model;
-                    });
-                }
+                SetGenericMenuItem(gm, "DeepSeek (深度求索)", DeepSeekModels);
+                SetGenericMenuItem(gm, "GLM (智谱清言)", GLMModels);
+                SetGenericMenuItem(gm, "Qwen (阿里)", QwenModels);
+                SetGenericMenuItem(gm, "Phi (Microsoft)", PhiModels);
+                SetGenericMenuItem(gm, "Llama (Meta)", LlamaModels);
+                SetGenericMenuItem(gm, "Mistral (Mistral AI)", MistralModels);
+                SetGenericMenuItem(gm, "Gemma (Google)", GemmaModels);
                 gm.AddSeparator("");
                 gm.AddItem(new GUIContent("Other......"), false, () =>
                 {
@@ -151,12 +176,23 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.backgroundColor = Color.yellow;
+            _ollamaGC.text = "Run In Ollama";
             if (GUILayout.Button(_ollamaGC, GUILayout.Height(30)))
             {
                 if (EditorUtility.DisplayDialog("Run In Ollama", $"是否确认在 Ollama 中启动大模型 [{_model}] ？如果该模型未下载，将自动下载。", "是的", "我再想想"))
                 {
-                    RunInOllama();
+                    RunOllamaInCMD($"ollama run {_model}");
                 }
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUI.backgroundColor = Color.yellow;
+            _ollamaGC.text = "View Ollama Model List";
+            if (GUILayout.Button(_ollamaGC, GUILayout.Height(30)))
+            {
+                RunOllamaInCMD("ollama list");
             }
             GUI.backgroundColor = Color.white;
             GUILayout.EndHorizontal();
@@ -189,9 +225,9 @@ namespace HT.Framework.AI
                 Close();
             }
         }
-        private void RunInOllama()
+        private void RunOllamaInCMD(string order)
         {
-            GUIUtility.systemCopyBuffer = $"ollama run {_model}";
+            GUIUtility.systemCopyBuffer = order;
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = "cmd.exe";
@@ -215,6 +251,17 @@ namespace HT.Framework.AI
 
             keybd_event(VK_RETURN, 0x45, KEYEVENTF_EXTENDEDKEY, 0);
             keybd_event(VK_RETURN, 0x45, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+        }
+        private void SetGenericMenuItem(GenericMenu gm, string group, string[] models)
+        {
+            for (int i = 0; i < models.Length; i++)
+            {
+                string model = models[i];
+                gm.AddItem(new GUIContent(group + "/" + model), model == _model, () =>
+                {
+                    _model = model;
+                });
+            }
         }
     }
 

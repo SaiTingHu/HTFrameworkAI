@@ -132,6 +132,10 @@ namespace HT.Framework.AI
                 {
                     Application.OpenURL("https://kimi.moonshot.cn");
                 });
+                gm.AddItem(new GUIContent("Qwen"), false, () =>
+                {
+                    Application.OpenURL("https://chat.qwenlm.ai/");
+                });
                 gm.AddItem(new GUIContent("ÖÇÆ×ÇåÑÔ"), false, () =>
                 {
                     Application.OpenURL("https://chatglm.cn");
