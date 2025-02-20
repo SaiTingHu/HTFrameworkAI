@@ -1,6 +1,7 @@
 ﻿using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace HT.Framework.AI
 {
@@ -50,7 +51,7 @@ namespace HT.Framework.AI
         {
             if (cmd.context is Component)
             {
-                if (cmd.context is MonoBehaviour)
+                if (cmd.context is MonoBehaviour && cmd.context is not UIBehaviour)
                 {
                     Log.Warning("继承至 MonoBehaviour 的脚本不支持 Ask AI Assistant。");
                 }

@@ -19,7 +19,15 @@ namespace HT.Framework.AI
             if (!string.IsNullOrEmpty(problem))
             {
                 window.SelectSession("Unity引擎助手");
-                window._userContent = problem;
+                EditorApplication.delayCall += () =>
+                {
+                    window._userContent = problem;
+                    if (!window._isReplying)
+                    {
+                        window.SendMessage();
+                        window.ToSessionScrollBottom();
+                    }
+                };
             }
             window.Show();
         }
@@ -638,7 +646,6 @@ namespace HT.Framework.AI
                 else if (reply == "</think>") _replyBuffer.Append("<推理完成>");
                 else _replyBuffer.Append(reply);
                 _assistantContent = _replyBuffer.ToString();
-                Focus();
                 Repaint();
             },
             (success) =>
