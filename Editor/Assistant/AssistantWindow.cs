@@ -521,7 +521,7 @@ namespace HT.Framework.AI
             string rootPath = GetSavePath();
             for (int i = 0; i < _sessions.Count; i++)
             {
-                _sessions[i].Data.Prompt = "";
+                _sessions[i].Data.messages.Clear();
                 string content = JsonToolkit.JsonToString(_sessions[i]);
                 File.WriteAllText($"{rootPath}{_sessions[i].ID}.session", content);
             }
@@ -565,8 +565,8 @@ namespace HT.Framework.AI
             bool isLogInEditor = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, false);
 
             ChatSession chatSession = new ChatSession(Guid.NewGuid().ToString("N").ToUpper(), sessionName);
-            chatSession.Data.Model = model;
-            chatSession.Data.Stream = stream;
+            chatSession.Data.model = model;
+            chatSession.Data.stream = stream;
             chatSession.BaseAddress = baseAddress;
             chatSession.API = api;
             chatSession.Timeout = timeout;
@@ -616,8 +616,8 @@ namespace HT.Framework.AI
 
             for (int i = 0; i < _sessions.Count; i++)
             {
-                _sessions[i].Data.Model = model;
-                _sessions[i].Data.Stream = stream;
+                _sessions[i].Data.model = model;
+                _sessions[i].Data.stream = stream;
                 _sessions[i].BaseAddress = baseAddress;
                 _sessions[i].API = api;
                 _sessions[i].Timeout = timeout;

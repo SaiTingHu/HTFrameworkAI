@@ -4,7 +4,6 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace HT.Framework.AI
 {
@@ -29,7 +28,7 @@ namespace HT.Framework.AI
         /// <summary>
         /// 远端大模型接口
         /// </summary>
-        public string API = "/api/generate";
+        public string API = "/api/chat";
         /// <summary>
         /// 会话超时时长（秒）
         /// </summary>
@@ -90,18 +89,18 @@ namespace HT.Framework.AI
         {
             Messages.Add(new ChatMessage { Role = "user", Think = null, Content = content, Date = DateTime.Now.ToDefaultDateString() });
 
-            GenerateTextAsync(replyCallback, endCallback);
+            ChatCompletionAsync(replyCallback, endCallback);
         }
 
-        private async void GenerateTextAsync(HTFAction<string> replyCallback, HTFAction<bool> endCallback)
+        private async void ChatCompletionAsync(HTFAction<string> replyCallback, HTFAction<bool> endCallback)
         {
             using HttpClient client = new HttpClient();
 
             client.BaseAddress = new Uri(BaseAddress);
             client.Timeout = TimeSpan.FromSeconds(Timeout);
 
-            Data.Prompt = BuildChatPrompt();
-            string jsonContent = JsonUtility.ToJson(Data);
+            BuildChatMessages();
+            string jsonContent = JsonToolkit.JsonToString(Data);
             using StringContent stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
 #if UNITY_EDITOR
@@ -122,7 +121,7 @@ namespace HT.Framework.AI
             {
                 using HttpResponseMessage response = await client.PostAsync(API, stringContent);
 
-                if (Data.Stream)
+                if (Data.stream)
                 {
                     using Stream stream = await response.Content.ReadAsStreamAsync();
                     using StreamReader reader = new StreamReader(stream);
@@ -133,13 +132,13 @@ namespace HT.Framework.AI
 #if UNITY_EDITOR
                         if (IsLogInEditor) Log.Info("<b>[Receive Data (Stream)]:</b> " + line);
 #endif
-                        GenerateText_ReceiveData receiveData = JsonUtility.FromJson<GenerateText_ReceiveData>(line);
+                        ChatCompletion_ReceiveData receiveData = JsonToolkit.StringToJson<ChatCompletion_ReceiveData>(line);
                         if (receiveData != null)
                         {
-                            if (string.IsNullOrEmpty(receiveData.error))
+                            if (string.IsNullOrEmpty(receiveData.error) && receiveData.message != null)
                             {
-                                replyCallback?.Invoke(receiveData.response);
-                                buffer.Append(receiveData.response);
+                                replyCallback?.Invoke(receiveData.message.content);
+                                buffer.Append(receiveData.message.content);
                             }
                             else
                             {
@@ -163,13 +162,13 @@ namespace HT.Framework.AI
 #if UNITY_EDITOR
                     if (IsLogInEditor) Log.Info("<b>[Receive Data (Non Stream)]:</b> " + result);
 #endif
-                    GenerateText_ReceiveData receiveData = JsonUtility.FromJson<GenerateText_ReceiveData>(result);
+                    ChatCompletion_ReceiveData receiveData = JsonToolkit.StringToJson<ChatCompletion_ReceiveData>(result);
                     if (receiveData != null)
                     {
-                        if (string.IsNullOrEmpty(receiveData.error))
+                        if (string.IsNullOrEmpty(receiveData.error) && receiveData.message != null)
                         {
-                            replyCallback?.Invoke(receiveData.response);
-                            buffer.Append(receiveData.response);
+                            replyCallback?.Invoke(receiveData.message.content);
+                            buffer.Append(receiveData.message.content);
                         }
                         else
                         {
@@ -204,35 +203,40 @@ namespace HT.Framework.AI
                 endCallback?.Invoke(isSuccess);
             }
         }
-        private string BuildChatPrompt()
+        private void BuildChatMessages()
         {
-            StringToolkit.BeginConcat();
+            Data.messages.Clear();
             if (!string.IsNullOrEmpty(PromptWords.Content))
             {
-                StringToolkit.Concat($"{PromptWords.Role}: {PromptWords.Content}", true);
+                Data.messages.Add(new ChatData.Message() { role = PromptWords.Role, content = PromptWords.Content });
             }
             int i = Messages.Count - Round;
             if (i < 0) i = 0;
             for (; i < Messages.Count; i++)
             {
-                StringToolkit.Concat($"{Messages[i].Role}: {Messages[i].Content}", i != Messages.Count - 1);
+                Data.messages.Add(new ChatData.Message() { role = Messages[i].Role, content = Messages[i].Content });
             }
-            return StringToolkit.EndConcat();
         }
 
         [Serializable]
         public class ChatData
         {
-            public string Model = "deepseek-coder-v2:16b";
-            public string Prompt;
-            public bool Stream = true;
-            public ChatOptions Parameters = new ChatOptions();
-        }
-        [Serializable]
-        public class ChatOptions
-        {
-            public int max_tokens = 4096;
-            public float temperature = 0.7f;
+            public string model = "deepseek-coder-v2:16b";
+            public List<Message> messages = new List<Message>();
+            public bool stream = true;
+            public Options options = new Options();
+
+            [Serializable]
+            public class Message
+            {
+                public string role;
+                public string content;
+            }
+            [Serializable]
+            public class Options
+            {
+                public float temperature = 0.8f;
+            }
         }
         [Serializable]
         public class ChatMessage
@@ -240,13 +244,21 @@ namespace HT.Framework.AI
             public string Role;
             public string Think;
             public string Content;
+            public string Images;
             public string Date;
             public bool IsFold;
         }
-        private class GenerateText_ReceiveData
+
+        private class ChatCompletion_ReceiveData
         {
-            public string response;
+            public Message message;
             public string error;
+
+            public class Message
+            {
+                public string role;
+                public string content;
+            }
         }
     }
 }
