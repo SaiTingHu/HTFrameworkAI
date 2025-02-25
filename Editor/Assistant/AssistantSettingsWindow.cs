@@ -15,21 +15,15 @@ namespace HT.Framework.AI
         private const byte VK_V = 0x56;
         private const byte VK_RETURN = 0x0D;
         private static string[] DeepSeekModels = new string[] { 
-            "deepseek-r1:1.5b"
-            , "deepseek-r1:7b"
-            , "deepseek-r1:8b"
+            "deepseek-r1:8b"
             , "deepseek-r1:14b"
             , "deepseek-r1:32b"
             , "deepseek-r1:70b"
             , "deepseek-r1:671b"
-            , "deepseek-coder:1.3b"
-            , "deepseek-coder:6.7b"
-            , "deepseek-coder:33b"
             , "deepseek-coder-v2:16b"
             , "deepseek-coder-v2:236b"
             , "deepseek-v2:16b"
             , "deepseek-v2:236b"
-            , "deepseek-v2.5:236b"
             , "deepseek-v3:671b"
             , "deepseek-llm:7b"
             , "deepseek-llm:67b"
@@ -43,18 +37,18 @@ namespace HT.Framework.AI
             , "qwen2.5:14b"
         };
         private static string[] PhiModels = new string[] {
-            "phi3:3.8b"
-            , "phi3:14b"
+            "phi3:14b"
             , "phi4:14b"
         };
         private static string[] LlamaModels = new string[] {
-            "llama3.1:8b"
-            , "llama3.2:1b"
-            , "llama3.2:3b"
+            "llama2:13b"
+            , "llama3:8b"
+            , "llama3.1:8b"
             , "llama3.3:70b"
         };
         private static string[] MistralModels = new string[] {
             "mistral:7b"
+            , "mistral-nemo:12b"
         };
         private static string[] GemmaModels = new string[] {
             "gemma:7b"
