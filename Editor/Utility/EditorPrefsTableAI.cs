@@ -68,6 +68,14 @@
         /// AI助手的 SavePath 配置
         /// </summary>
         public static readonly string Assistant_SavePath = "HT.Framework.AI.Assistant.SavePath";
+        /// <summary>
+        /// AI助手的 EnableAIButler 配置
+        /// </summary>
+        public static readonly string Assistant_EnableAIButler = "HT.Framework.AI.Assistant.EnableAIButler";
+        /// <summary>
+        /// AI助手的 AIButlerAgent 配置
+        /// </summary>
+        public static readonly string Assistant_AIButlerAgent = "HT.Framework.AI.Assistant.AIButlerAgent";
         #endregion
     }
 }

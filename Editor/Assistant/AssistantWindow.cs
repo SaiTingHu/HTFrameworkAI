@@ -18,7 +18,7 @@ namespace HT.Framework.AI
             window.LoadSessions();
             if (!string.IsNullOrEmpty(problem))
             {
-                window.SelectSession("UnityÒıÇæÖúÊÖ");
+                window.SelectSession("Unityå¼•æ“åŠ©æ‰‹");
                 EditorApplication.delayCall += () =>
                 {
                     window._userContent = problem;
@@ -34,6 +34,7 @@ namespace HT.Framework.AI
 
         private List<ChatSession> _sessions = new List<ChatSession>();
         private int _currentSession = -1;
+        private bool _isEnableAIButler = false;
         private bool _isShowThink = false;
         private bool _isLoaded = false;
         private Type _markdownWindowType;
@@ -45,30 +46,31 @@ namespace HT.Framework.AI
 
         private Texture _assistantIcon;
         private Texture _userIcon;
-        private GUIContent _assistantGC;
-        private GUIContent _userGC;
-        private GUIContent _favoriteGC;
-        private GUIContent _settingsGC;
-        private GUIContent _promptWordGC;
-        private GUIContent _deleteGC;
-        private GUIContent _foldGC;
-        private GUIContent _noFoldGC;
-        private GUIContent _copyGC;
-        private GUIContent _markdownGC;
-        private GUIStyle _userStyle;
-        private GUIStyle _assistantStyle;
-        private GUIStyle _dateStyle;
+        internal GUIContent _assistantGC;
+        internal GUIContent _userGC;
+        internal GUIContent _favoriteGC;
+        internal GUIContent _settingsGC;
+        internal GUIContent _promptWordGC;
+        internal GUIContent _deleteGC;
+        internal GUIContent _foldGC;
+        internal GUIContent _noFoldGC;
+        internal GUIContent _copyGC;
+        internal GUIContent _markdownGC;
+        internal GUIContent _butlerGC;
+        internal GUIStyle _userStyle;
+        internal GUIStyle _assistantStyle;
+        internal GUIStyle _dateStyle;
         private Vector2 _sessionListScroll;
         private Vector2 _sessionScroll;
         private Rect _sessionRect;
 
-        protected override bool IsEnableTitleGUI => true;
         protected override string HelpUrl => "https://wanderer.blog.csdn.net/article/details/145637201";
 
         protected override void OnEnable()
         {
             base.OnEnable();
 
+            _isEnableAIButler = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_EnableAIButler, false);
             _isShowThink = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_ShowThink, false);
             _markdownWindowType = Type.GetType("HT.ModuleManager.Markdown.MarkdownWindow,HT.ModuleManager");
 
@@ -86,22 +88,26 @@ namespace HT.Framework.AI
             _settingsGC.tooltip = "Settings";
             _promptWordGC = new GUIContent();
             _promptWordGC.image = EditorGUIUtility.IconContent("Profiler.Memory").image;
-            _promptWordGC.tooltip = "ÉèÖÃÖÇÄÜÌåÌáÊ¾´Ê";
+            _promptWordGC.tooltip = "è®¾ç½®æ™ºèƒ½ä½“æç¤ºè¯";
             _deleteGC = new GUIContent();
             _deleteGC.image = EditorGUIUtility.IconContent("TreeEditor.Trash").image;
-            _deleteGC.tooltip = "É¾³ı´Ë»á»°";
+            _deleteGC.tooltip = "åˆ é™¤æ­¤ä¼šè¯";
             _foldGC = new GUIContent();
             _foldGC.image = EditorGUIUtility.IconContent("animationvisibilitytoggleoff").image;
-            _foldGC.tooltip = "ÕÛµşÄÚÈİ";
+            _foldGC.tooltip = "æŠ˜å å†…å®¹";
             _noFoldGC = new GUIContent();
             _noFoldGC.image = EditorGUIUtility.IconContent("animationvisibilitytoggleon").image;
-            _noFoldGC.tooltip = "Õ¹¿ªÄÚÈİ";
+            _noFoldGC.tooltip = "å±•å¼€å†…å®¹";
             _copyGC = new GUIContent();
             _copyGC.image = EditorGUIUtility.IconContent("d_winbtn_win_restore@2x").image;
-            _copyGC.tooltip = "¸´ÖÆÄÚÈİ";
+            _copyGC.tooltip = "å¤åˆ¶å†…å®¹";
             _markdownGC = new GUIContent();
             _markdownGC.image = EditorGUIUtility.IconContent("d_UnityEditor.ConsoleWindow").image;
-            _markdownGC.tooltip = "ÔÚÍ¨ÓÃ Markdown ²é¿´´°¿ÚÖĞÔ¤ÀÀÄÚÈİ";
+            _markdownGC.tooltip = "åœ¨é€šç”¨ Markdown æŸ¥çœ‹çª—å£ä¸­é¢„è§ˆå†…å®¹";
+            _butlerGC = new GUIContent();
+            _butlerGC.image = EditorGUIUtility.IconContent("ParticleSystemForceField Icon").image;
+            _butlerGC.text = "æ™ºèƒ½ç®¡å®¶";
+            _butlerGC.tooltip = "æ™ºèƒ½ç®¡å®¶";
 
             if (_userStyle == null)
             {
@@ -140,23 +146,23 @@ namespace HT.Framework.AI
                 {
                     Application.OpenURL("https://kimi.moonshot.cn");
                 });
-                gm.AddItem(new GUIContent("Qwen"), false, () =>
-                {
-                    Application.OpenURL("https://chat.qwenlm.ai/");
-                });
-                gm.AddItem(new GUIContent("ÖÇÆ×ÇåÑÔ"), false, () =>
+                gm.AddItem(new GUIContent("æ™ºè°±æ¸…è¨€"), false, () =>
                 {
                     Application.OpenURL("https://chatglm.cn");
                 });
-                gm.AddItem(new GUIContent("Í¨ÒåÇ§ÎÊ"), false, () =>
+                gm.AddItem(new GUIContent("è…¾è®¯æ··å…ƒ"), false, () =>
+                {
+                    Application.OpenURL("https://hunyuan.tencent.com/");
+                });
+                gm.AddItem(new GUIContent("é€šä¹‰åƒé—®"), false, () =>
                 {
                     Application.OpenURL("https://tongyi.aliyun.com");
                 });
-                gm.AddItem(new GUIContent("ÎÄĞÄÒ»ÑÔ"), false, () =>
+                gm.AddItem(new GUIContent("æ–‡å¿ƒä¸€è¨€"), false, () =>
                 {
                     Application.OpenURL("https://yiyan.baidu.com");
                 });
-                gm.AddItem(new GUIContent("¶¹°ü"), false, () =>
+                gm.AddItem(new GUIContent("è±†åŒ…"), false, () =>
                 {
                     Application.OpenURL("https://www.doubao.com/chat/");
                 });
@@ -193,7 +199,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.enabled = _currentSession != -1 && !_isReplying;
-            if (GUILayout.Button("¿ªÆôĞÂ»á»°", EditorGlobalTools.Styles.LargeButton))
+            if (GUILayout.Button("å¼€å¯æ–°ä¼šè¯", EditorGlobalTools.Styles.LargeButton))
             {
                 _currentSession = -1;
             }
@@ -203,6 +209,16 @@ namespace HT.Framework.AI
             _sessionListScroll = GUILayout.BeginScrollView(_sessionListScroll);
 
             GUI.enabled = !_isReplying;
+
+            if (_isEnableAIButler)
+            {
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button(_butlerGC, EditorGlobalTools.Styles.LargeButton))
+                {
+                    AIButlerWindow.OpenWindow(this);
+                }
+                GUILayout.EndHorizontal();
+            }
 
             for (int i = 0; i < _sessions.Count; i++)
             {
@@ -230,7 +246,7 @@ namespace HT.Framework.AI
                 if (GUILayout.Button(_deleteGC, EditorGlobalTools.Styles.InvisibleButton, GUILayout.Width(20), GUILayout.Height(30)))
                 {
                     ChatSession chatSession = _sessions[i];
-                    if (EditorUtility.DisplayDialog("É¾³ı»á»°", $"ÊÇ·ñÈ·ÈÏÉ¾³ı»á»°¡¾{chatSession.Name}¡¿£¿", "ÊÇµÄ", "ÎÒÔÙÏëÏë"))
+                    if (EditorUtility.DisplayDialog("åˆ é™¤ä¼šè¯", $"æ˜¯å¦ç¡®è®¤åˆ é™¤ä¼šè¯ã€{chatSession.Name}ã€‘ï¼Ÿ", "æ˜¯çš„", "æˆ‘å†æƒ³æƒ³"))
                     {
                         DeleteSession(chatSession);
                         GUI.FocusControl(null);
@@ -260,11 +276,11 @@ namespace HT.Framework.AI
                     if (!_isReplying)
                     {
                         GenericMenu gm = new GenericMenu();
-                        gm.AddItem(new GUIContent("ÖØÃüÃû"), false, () =>
+                        gm.AddItem(new GUIContent("é‡å‘½å"), false, () =>
                         {
                             AssistantRenameWindow.OpenWindow(this, chatSession);
                         });
-                        gm.AddItem(new GUIContent("Çå¿Õ¼ÇÂ¼"), false, () =>
+                        gm.AddItem(new GUIContent("æ¸…ç©ºè®°å½•"), false, () =>
                         {
                             chatSession.Messages.Clear();
                         });
@@ -277,7 +293,7 @@ namespace HT.Framework.AI
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
                 GUI.color = Color.gray;
-                GUILayout.Label($"¹²{chatSession.Messages.Count}Ìõ¼ÇÂ¼", GUILayout.ExpandWidth(true));
+                GUILayout.Label($"å…±{chatSession.Messages.Count}æ¡è®°å½•", GUILayout.ExpandWidth(true));
                 GUI.color = Color.white;
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
@@ -310,7 +326,7 @@ namespace HT.Framework.AI
 
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("ĞÂµÄ»á»°", "WarningOverlay", GUILayout.Width(100));
+                GUILayout.Label("æ–°çš„ä¼šè¯", "WarningOverlay", GUILayout.Width(100));
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
@@ -318,7 +334,7 @@ namespace HT.Framework.AI
 
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("ÎÒÊÇÄãµÄ¸öÈËAIÖúÊÖ£¬ºÜ¸ßĞË¼ûµ½Äã£¡", EditorStyles.boldLabel);
+                GUILayout.Label("æˆ‘æ˜¯ä½ çš„ä¸ªäººAIåŠ©æ‰‹ï¼Œå¾ˆé«˜å…´è§åˆ°ä½ ï¼", EditorStyles.boldLabel);
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
@@ -326,7 +342,7 @@ namespace HT.Framework.AI
 
                 GUILayout.BeginHorizontal();
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("ÎÒ¿ÉÒÔ°ïÄãĞ´´úÂë¡¢¶ÁÎÄ¼ş¡¢Ğ´×÷¸÷ÖÖ´´ÒâÄÚÈİ£¬Çë°ÑÄãµÄÈÎÎñ½»¸øÎÒ°É~");
+                GUILayout.Label("æˆ‘å¯ä»¥å¸®ä½ å†™ä»£ç ã€è¯»æ–‡ä»¶ã€å†™ä½œå„ç§åˆ›æ„å†…å®¹ï¼Œè¯·æŠŠä½ çš„ä»»åŠ¡äº¤ç»™æˆ‘å§~");
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
@@ -337,7 +353,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.color = Color.yellow;
-            GUILayout.Label("¸øAIÖúÊÖ·¢ËÍÏûÏ¢£º");
+            GUILayout.Label("ç»™AIåŠ©æ‰‹å‘é€æ¶ˆæ¯ï¼š");
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -348,7 +364,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.enabled = !string.IsNullOrEmpty(_userContent) && !_isReplying;
-            if (GUILayout.Button("·¢ËÍÏûÏ¢", EditorGlobalTools.Styles.LargeButton))
+            if (GUILayout.Button("å‘é€æ¶ˆæ¯", EditorGlobalTools.Styles.LargeButton))
             {
                 SendMessage();
                 ToSessionScrollBottom();
@@ -404,7 +420,7 @@ namespace HT.Framework.AI
                 }
                 else
                 {
-                    Log.Error("Î´ÕÒµ½ HTModuleManager Ä£¿é£¬²»Ö§³ÖÔÚÍ¨ÓÃ Markdown ²é¿´´°¿ÚÖĞÔ¤ÀÀÄÚÈİ¡£");
+                    Log.Error("æœªæ‰¾åˆ° HTModuleManager æ¨¡å—ï¼Œä¸æ”¯æŒåœ¨é€šç”¨ Markdown æŸ¥çœ‹çª—å£ä¸­é¢„è§ˆå†…å®¹ã€‚");
                 }
             }
             GUILayout.FlexibleSpace();
@@ -413,7 +429,7 @@ namespace HT.Framework.AI
             if (message.IsFold)
             {
                 GUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("ÄÚÈİÒÑÕÛµş......", _assistantStyle);
+                EditorGUILayout.LabelField("å†…å®¹å·²æŠ˜å ......", _assistantStyle);
                 GUILayout.EndHorizontal();
             }
             else
@@ -443,14 +459,14 @@ namespace HT.Framework.AI
                 if (!string.IsNullOrEmpty(_assistantContent))
                 {
                     GUI.color = Color.gray;
-                    GUILayout.Label("ÕıÔÚÊäÈë......", _dateStyle, GUILayout.Height(40));
+                    GUILayout.Label("æ­£åœ¨è¾“å…¥......", _dateStyle, GUILayout.Height(40));
                     GUI.color = Color.white;
                 }
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal("textarea");
-                EditorGUILayout.LabelField(string.IsNullOrEmpty(_assistantContent) ? "Ë¼¿¼ÖĞ......" : _assistantContent, _assistantStyle);
+                EditorGUILayout.LabelField(string.IsNullOrEmpty(_assistantContent) ? "æ€è€ƒä¸­......" : _assistantContent, _assistantStyle);
                 GUILayout.EndHorizontal();
 
                 GUILayout.Space(5);
@@ -486,7 +502,7 @@ namespace HT.Framework.AI
         }
 
         /// <summary>
-        /// ´ÓÎÄ¼ş¼ÓÔØ»á»°
+        /// ä»æ–‡ä»¶åŠ è½½ä¼šè¯
         /// </summary>
         private void LoadSessions()
         {
@@ -508,13 +524,13 @@ namespace HT.Framework.AI
                 }
             }
 
-            if (!_sessions.Exists((s) => { return s.Name == "UnityÒıÇæÖúÊÖ"; }))
+            if (!_sessions.Exists((s) => { return s.Name == "Unityå¼•æ“åŠ©æ‰‹"; }))
             {
-                CreateSession("UnityÒıÇæÖúÊÖ");
+                CreateSession("Unityå¼•æ“åŠ©æ‰‹");
             }
         }
         /// <summary>
-        /// ±£´æ»á»°µ½ÎÄ¼şÖĞ
+        /// ä¿å­˜ä¼šè¯åˆ°æ–‡ä»¶ä¸­
         /// </summary>
         private void SaveSessions()
         {
@@ -527,7 +543,7 @@ namespace HT.Framework.AI
             }
         }
         /// <summary>
-        /// »ñÈ¡»á»°Êı¾İ´æ´¢Â·¾¶
+        /// è·å–ä¼šè¯æ•°æ®å­˜å‚¨è·¯å¾„
         /// </summary>
         private string GetSavePath()
         {
@@ -552,14 +568,14 @@ namespace HT.Framework.AI
         }
 
         /// <summary>
-        /// ´´½¨ĞÂµÄ»á»°
+        /// åˆ›å»ºæ–°çš„ä¼šè¯
         /// </summary>
         private void CreateSession(string sessionName)
         {
             string model = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_Model, "deepseek-coder-v2:16b");
             bool stream = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_Stream, true);
             string baseAddress = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_BaseAddress, "http://localhost:11434");
-            string api = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_API, "/api/generate");
+            string api = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_API, "/api/chat");
             int timeout = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Timeout, 60);
             int round = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Round, 7);
             bool isLogInEditor = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, false);
@@ -577,7 +593,7 @@ namespace HT.Framework.AI
             _currentSession = _sessions.Count - 1;
         }
         /// <summary>
-        /// É¾³ı»á»°
+        /// åˆ é™¤ä¼šè¯
         /// </summary>
         private void DeleteSession(ChatSession chatSession)
         {
@@ -592,7 +608,7 @@ namespace HT.Framework.AI
             }
         }
         /// <summary>
-        /// Í¨¹ıÃû³ÆÑ¡ÖĞÖ¸¶¨µÄ»á»°
+        /// é€šè¿‡åç§°é€‰ä¸­æŒ‡å®šçš„ä¼šè¯
         /// </summary>
         private void SelectSession(string sessionName)
         {
@@ -601,14 +617,14 @@ namespace HT.Framework.AI
         }
 
         /// <summary>
-        /// Ó¦ÓÃÉèÖÃÏî
+        /// åº”ç”¨è®¾ç½®é¡¹
         /// </summary>
         internal void ApplySettings()
         {
             string model = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_Model, "deepseek-coder-v2:16b");
             bool stream = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_Stream, true);
             string baseAddress = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_BaseAddress, "http://localhost:11434");
-            string api = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_API, "/api/generate");
+            string api = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_API, "/api/chat");
             int timeout = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Timeout, 60);
             int round = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Round, 7);
             bool isLogInEditor = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, false);
@@ -626,7 +642,7 @@ namespace HT.Framework.AI
             }
         }
         /// <summary>
-        /// ·¢ËÍÏûÏ¢£¨µ±Ç°»á»°£©
+        /// å‘é€æ¶ˆæ¯ï¼ˆå½“å‰ä¼šè¯ï¼‰
         /// </summary>
         private void SendMessage()
         {
@@ -642,8 +658,8 @@ namespace HT.Framework.AI
             _sessions[_currentSession].UserSpeak(_userContent,
             (reply) =>
             {
-                if (reply == "<think>") _replyBuffer.Append("<¿ªÊ¼ÍÆÀí>£º");
-                else if (reply == "</think>") _replyBuffer.Append("<ÍÆÀíÍê³É>");
+                if (reply == "<think>") _replyBuffer.Append("<å¼€å§‹æ¨ç†>ï¼š");
+                else if (reply == "</think>") _replyBuffer.Append("<æ¨ç†å®Œæˆ>");
                 else _replyBuffer.Append(reply);
                 _assistantContent = _replyBuffer.ToString();
                 Repaint();

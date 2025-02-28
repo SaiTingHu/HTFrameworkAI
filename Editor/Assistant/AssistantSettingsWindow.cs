@@ -61,8 +61,8 @@ namespace HT.Framework.AI
             AssistantSettingsWindow window = GetWindow<AssistantSettingsWindow>();
             window.titleContent.text = "Assistant Settings";
             window._assistantWindow = assistantWindow;
-            window.minSize = new Vector2(300, 280);
-            window.maxSize = new Vector2(300, 280);
+            window.minSize = new Vector2(300, 300);
+            window.maxSize = new Vector2(300, 300);
             window.Show();
         }
         [DllImport("user32.dll")]
@@ -80,6 +80,7 @@ namespace HT.Framework.AI
         private bool _isLogInEditor;
         private bool _isShowThink;
         private AssistantSessionSavePath _savePath;
+        private bool _isEnableAIButler;
 
         protected override void OnEnable()
         {
@@ -91,12 +92,13 @@ namespace HT.Framework.AI
             _model = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_Model, "deepseek-coder-v2:16b");
             _stream = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_Stream, true);
             _baseAddress = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_BaseAddress, "http://localhost:11434");
-            _api = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_API, "/api/generate");
+            _api = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_API, "/api/chat");
             _timeout = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Timeout, 60);
             _round = EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_Round, 7);
             _isLogInEditor = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, false);
             _isShowThink = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_ShowThink, false);
             _savePath = (AssistantSessionSavePath)EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_SavePath, 0);
+            _isEnableAIButler = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_EnableAIButler, false);
         }
         protected override void OnBodyGUI()
         {
@@ -110,7 +112,7 @@ namespace HT.Framework.AI
                 GenericMenu gm = new GenericMenu();
                 SetGenericMenuItem(gm, "DeepSeek (深度求索)", DeepSeekModels);
                 SetGenericMenuItem(gm, "GLM (智谱清言)", GLMModels);
-                SetGenericMenuItem(gm, "Qwen (阿里)", QwenModels);
+                SetGenericMenuItem(gm, "Qwen (通义千问)", QwenModels);
                 SetGenericMenuItem(gm, "Phi (Microsoft)", PhiModels);
                 SetGenericMenuItem(gm, "Llama (Meta)", LlamaModels);
                 SetGenericMenuItem(gm, "Mistral (Mistral AI)", MistralModels);
@@ -164,6 +166,13 @@ namespace HT.Framework.AI
             _savePath = (AssistantSessionSavePath)EditorGUILayout.EnumPopup(_savePath);
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUI.color = _isEnableAIButler ? Color.green : Color.gray;
+            GUILayout.Label("启用智能管家", GUILayout.Width(100));
+            _isEnableAIButler = EditorGUILayout.Toggle(_isEnableAIButler);
+            GUI.color = Color.white;
+            GUILayout.EndHorizontal();
+
             GUILayout.Space(10);
 
             GUILayout.FlexibleSpace();
@@ -203,6 +212,7 @@ namespace HT.Framework.AI
                 EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, _isLogInEditor);
                 EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_ShowThink, _isShowThink);
                 EditorPrefs.SetInt(EditorPrefsTableAI.Assistant_SavePath, (int)_savePath);
+                EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_EnableAIButler, _isEnableAIButler);
                 _assistantWindow.ApplySettings();
                 Close();
             }

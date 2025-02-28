@@ -224,6 +224,7 @@ namespace HT.Framework.AI
             public string model = "deepseek-coder-v2:16b";
             public List<Message> messages = new List<Message>();
             public bool stream = true;
+            public string format = null;
             public Options options = new Options();
 
             [Serializable]
