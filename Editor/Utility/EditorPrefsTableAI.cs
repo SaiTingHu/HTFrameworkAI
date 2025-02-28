@@ -73,9 +73,29 @@
         /// </summary>
         public static readonly string Assistant_EnableAIButler = "HT.Framework.AI.Assistant.EnableAIButler";
         /// <summary>
-        /// AI助手的 AIButlerAgent 配置
+        /// AI智能管家的 Agent 配置
         /// </summary>
-        public static readonly string Assistant_AIButlerAgent = "HT.Framework.AI.Assistant.AIButlerAgent";
+        public static readonly string AIButler_Agent = "HT.Framework.AI.AIButler.Agent";
+        /// <summary>
+        /// AI智能管家的 Permission.OpenURL 配置
+        /// </summary>
+        public static readonly string AIButler_PermissionOpenURL = "HT.Framework.AI.AIButler.Permission.OpenURL";
+        /// <summary>
+        /// AI智能管家的 Permission.OpenProgram 配置
+        /// </summary>
+        public static readonly string AIButler_PermissionOpenProgram = "HT.Framework.AI.AIButler.Permission.OpenProgram";
+        /// <summary>
+        /// AI智能管家的 Permission.RunCode 配置
+        /// </summary>
+        public static readonly string AIButler_PermissionRunCode = "HT.Framework.AI.AIButler.Permission.RunCode";
+        /// <summary>
+        /// AI智能管家的 Permission.ReadFile 配置
+        /// </summary>
+        public static readonly string AIButler_PermissionReadFile = "HT.Framework.AI.AIButler.Permission.ReadFile";
+        /// <summary>
+        /// AI智能管家的 Permission.WriteFile 配置
+        /// </summary>
+        public static readonly string AIButler_PermissionWriteFile = "HT.Framework.AI.AIButler.Permission.WriteFile";
         #endregion
     }
 }

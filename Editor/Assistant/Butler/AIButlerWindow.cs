@@ -34,7 +34,7 @@ namespace HT.Framework.AI
             {
                 if (_butlerAgent == null)
                 {
-                    string agent = EditorPrefs.GetString(EditorPrefsTableAI.Assistant_AIButlerAgent, "<None>");
+                    string agent = EditorPrefs.GetString(EditorPrefsTableAI.AIButler_Agent, "<None>");
                     Type type = (agent == "<None>") ? null : ReflectionToolkit.GetTypeInAllAssemblies(agent, false);
                     if (type != null)
                     {
