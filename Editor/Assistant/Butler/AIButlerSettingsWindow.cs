@@ -41,7 +41,7 @@ namespace HT.Framework.AI
             base.OnBodyGUI();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("智能管家代理", GUILayout.Width(100));
+            GUILayout.Label("智能管家代理", GUILayout.Width(120));
             if (GUILayout.Button(_agent, EditorStyles.popup))
             {
                 GenericMenu gm = new GenericMenu();
@@ -67,32 +67,32 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("为智能管家开放权限：");
+            GUILayout.Label("智能管家权限：");
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("  访问 Web 网站", GUILayout.Width(100));
+            GUILayout.Label("    访问 Web 网站", GUILayout.Width(120));
             _permissionOpenURL = EditorGUILayout.Toggle(_permissionOpenURL);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("  访问外部程序", GUILayout.Width(100));
+            GUILayout.Label("    访问外部程序", GUILayout.Width(120));
             _permissionOpenProgram = EditorGUILayout.Toggle(_permissionOpenProgram);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("  运行代码", GUILayout.Width(100));
+            GUILayout.Label("    运行代码", GUILayout.Width(120));
             _permissionRunCode = EditorGUILayout.Toggle(_permissionRunCode);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("  读取文件", GUILayout.Width(100));
+            GUILayout.Label("    读取文件", GUILayout.Width(120));
             _permissionReadFile = EditorGUILayout.Toggle(_permissionReadFile);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("  写入文件", GUILayout.Width(100));
+            GUILayout.Label("    写入文件", GUILayout.Width(120));
             _permissionWriteFile = EditorGUILayout.Toggle(_permissionWriteFile);
             GUILayout.EndHorizontal();
 

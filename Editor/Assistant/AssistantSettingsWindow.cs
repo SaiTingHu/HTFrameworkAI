@@ -105,7 +105,7 @@ namespace HT.Framework.AI
             base.OnBodyGUI();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("大模型", GUILayout.Width(100));
+            GUILayout.Label("大模型", GUILayout.Width(120));
             _model = EditorGUILayout.TextField(_model);
             if (GUILayout.Button("选择", EditorStyles.popup))
             {
@@ -127,48 +127,48 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("流式请求", GUILayout.Width(100));
+            GUILayout.Label("流式请求", GUILayout.Width(120));
             _stream = EditorGUILayout.Toggle(_stream);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("大模型根地址", GUILayout.Width(100));
+            GUILayout.Label("大模型根地址", GUILayout.Width(120));
             _baseAddress = EditorGUILayout.TextField(_baseAddress);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("API接口", GUILayout.Width(100));
+            GUILayout.Label("API接口", GUILayout.Width(120));
             _api = EditorGUILayout.TextField(_api);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("超时时长（秒）", GUILayout.Width(100));
+            GUILayout.Label("超时时长（秒）", GUILayout.Width(120));
             _timeout = EditorGUILayout.IntField(_timeout);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("多轮对话最大轮数", GUILayout.Width(100));
+            GUILayout.Label("多轮对话最大轮数", GUILayout.Width(120));
             _round = EditorGUILayout.IntField(_round);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("打印相关日志", GUILayout.Width(100));
+            GUILayout.Label("打印相关日志", GUILayout.Width(120));
             _isLogInEditor = EditorGUILayout.Toggle(_isLogInEditor);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("显示推理过程", GUILayout.Width(100));
+            GUILayout.Label("显示推理过程", GUILayout.Width(120));
             _isShowThink = EditorGUILayout.Toggle(_isShowThink);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("数据存储路径", GUILayout.Width(100));
+            GUILayout.Label("数据存储路径", GUILayout.Width(120));
             _savePath = (AssistantSessionSavePath)EditorGUILayout.EnumPopup(_savePath);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUI.color = _isEnableAIButler ? Color.green : Color.gray;
-            GUILayout.Label("启用智能管家", GUILayout.Width(100));
+            GUILayout.Label("启用智能管家", GUILayout.Width(120));
             _isEnableAIButler = EditorGUILayout.Toggle(_isEnableAIButler);
             GUI.color = Color.white;
             GUILayout.EndHorizontal();

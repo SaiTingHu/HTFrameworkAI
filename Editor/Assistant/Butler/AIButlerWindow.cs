@@ -76,12 +76,15 @@ namespace HT.Framework.AI
         {
             base.OnBodyGUI();
 
-            if (ButlerAgent == null)
-                return;
-
-            EventHandle();
-
-            OnSessionGUI();
+            if (ButlerAgent != null)
+            {
+                EventHandle();
+                OnSessionGUI();
+            }
+            else
+            {
+                OnErrorGUI();
+            }
         }
         private void OnSessionGUI()
         {
@@ -145,6 +148,28 @@ namespace HT.Framework.AI
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+        }
+        private void OnErrorGUI()
+        {
+            GUILayout.BeginVertical();
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginHorizontal();
+
+            GUILayout.FlexibleSpace();
+
+            GUI.color = Color.yellow;
+            GUILayout.Label("当前无法启用智能管家，请设置【智能管家代理】。", EditorStyles.largeLabel);
+            GUI.color = Color.white;
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.FlexibleSpace();
 
             GUILayout.EndVertical();
         }
