@@ -89,18 +89,39 @@ namespace HT.Framework.AI
         {
             Messages.Add(new ChatMessage { Role = "user", Think = null, Content = content, Date = DateTime.Now.ToDefaultDateString() });
 
-            ChatCompletionAsync(replyCallback, endCallback);
+            ChatCompletionAsync(null, replyCallback, endCallback);
+        }
+        /// <summary>
+        /// 用户说话
+        /// </summary>
+        /// <param name="content">说话内容</param>
+        /// <param name="customData">自定义会话数据</param>
+        /// <param name="replyCallback">AI回话时回调（如果是流式请求，则重复回调此委托）</param>
+        /// <param name="endCallback">AI回话结束（参数为本次请求是否成功）</param>
+        public void UserSpeak(string content, string customData, HTFAction<string> replyCallback, HTFAction<bool> endCallback)
+        {
+            Messages.Add(new ChatMessage { Role = "user", Think = null, Content = content, Date = DateTime.Now.ToDefaultDateString() });
+
+            ChatCompletionAsync(customData, replyCallback, endCallback);
         }
 
-        private async void ChatCompletionAsync(HTFAction<string> replyCallback, HTFAction<bool> endCallback)
+        private async void ChatCompletionAsync(string customData, HTFAction<string> replyCallback, HTFAction<bool> endCallback)
         {
             using HttpClient client = new HttpClient();
 
             client.BaseAddress = new Uri(BaseAddress);
             client.Timeout = TimeSpan.FromSeconds(Timeout);
 
-            BuildChatMessages();
-            string jsonContent = JsonToolkit.JsonToString(Data);
+            string jsonContent = null;
+            if (string.IsNullOrEmpty(customData))
+            {
+                BuildChatMessages();
+                jsonContent = JsonToolkit.JsonToString(Data);
+            }
+            else
+            {
+                jsonContent = customData;
+            }
             using StringContent stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
 #if UNITY_EDITOR
@@ -224,7 +245,6 @@ namespace HT.Framework.AI
             public string model = "deepseek-coder-v2:16b";
             public List<Message> messages = new List<Message>();
             public bool stream = true;
-            public string format = null;
             public Options options = new Options();
 
             [Serializable]

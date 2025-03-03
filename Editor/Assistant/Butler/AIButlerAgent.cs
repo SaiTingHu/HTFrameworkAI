@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace HT.Framework.AI
 {
     /// <summary>
@@ -11,10 +9,6 @@ namespace HT.Framework.AI
         /// 智能管家姓名
         /// </summary>
         public abstract string Name { get; }
-        /// <summary>
-        /// 与智能管家的聊天记录
-        /// </summary>
-        public List<ChatSession.ChatMessage> Messages { get; protected set; } = new List<ChatSession.ChatMessage>();
 
         /// <summary>
         /// 初始化智能管家
@@ -25,6 +19,6 @@ namespace HT.Framework.AI
         /// </summary>
         /// <param name="content">用户消息</param>
         /// <param name="endCallback">结束回调</param>
-        public abstract void SendMessage(string content, HTFAction endCallback);
+        public abstract void SendMessage(string content, HTFAction<string> endCallback);
     }
 }

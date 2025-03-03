@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static HT.Framework.AI.ChatSession;
 
 namespace HT.Framework.AI
 {
@@ -17,6 +19,7 @@ namespace HT.Framework.AI
 
         private AssistantWindow _assistantWindow;
         private AIButlerAgent _butlerAgent;
+        private List<ChatMessage> _messages = new List<ChatMessage>();
         private bool _isReplying = false;
         private string _userContent;
 
@@ -99,7 +102,7 @@ namespace HT.Framework.AI
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             GUI.color = Color.gray;
-            GUILayout.Label($"共{ButlerAgent.Messages.Count}条记录", GUILayout.ExpandWidth(true));
+            GUILayout.Label($"共{_messages.Count}条记录", GUILayout.ExpandWidth(true));
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -107,9 +110,9 @@ namespace HT.Framework.AI
             GUILayout.Space(5);
 
             _sessionScroll = GUILayout.BeginScrollView(_sessionScroll);
-            for (int i = 0; i < ButlerAgent.Messages.Count; i++)
+            for (int i = 0; i < _messages.Count; i++)
             {
-                ChatSession.ChatMessage message = ButlerAgent.Messages[i];
+                ChatMessage message = _messages[i];
                 if (message.Role == "user")
                 {
                     OnUserMessageGUI(message);
@@ -120,7 +123,7 @@ namespace HT.Framework.AI
                 }
                 GUILayout.Space(5);
             }
-            _sessionRect = ButlerAgent.Messages.Count > 0 ? GUILayoutUtility.GetLastRect() : Rect.zero;
+            _sessionRect = _messages.Count > 0 ? GUILayoutUtility.GetLastRect() : Rect.zero;
             OnReplyingMessageGUI();
             GUILayout.EndScrollView();
 
@@ -173,7 +176,7 @@ namespace HT.Framework.AI
 
             GUILayout.EndVertical();
         }
-        private void OnUserMessageGUI(ChatSession.ChatMessage message)
+        private void OnUserMessageGUI(ChatMessage message)
         {
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -187,7 +190,7 @@ namespace HT.Framework.AI
             EditorGUILayout.TextArea(message.Content, _assistantWindow._userStyle);
             GUILayout.EndHorizontal();
         }
-        private void OnAssistantMessageGUI(ChatSession.ChatMessage message)
+        private void OnAssistantMessageGUI(ChatMessage message)
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label(_aiButlerGC, GUILayout.Width(40), GUILayout.Height(40));
@@ -207,9 +210,6 @@ namespace HT.Framework.AI
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(_aiButlerGC, GUILayout.Width(40), GUILayout.Height(40));
-                GUI.color = Color.gray;
-                GUILayout.Label("正在输入......", _assistantWindow._dateStyle, GUILayout.Height(40));
-                GUI.color = Color.white;
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
@@ -256,9 +256,15 @@ namespace HT.Framework.AI
         {
             _isReplying = true;
 
-            ButlerAgent.SendMessage(_userContent, () =>
+            _messages.Add(new ChatMessage { Role = "user", Think = null, Content = _userContent, Date = DateTime.Now.ToDefaultDateString() });
+            ButlerAgent.SendMessage(_userContent, (reply) =>
             {
                 _isReplying = false;
+
+                if (!string.IsNullOrEmpty(reply))
+                {
+                    _messages.Add(new ChatMessage { Role = "assistant", Think = null, Content = reply, Date = DateTime.Now.ToDefaultDateString() });
+                }
 
                 Focus();
                 Repaint();
