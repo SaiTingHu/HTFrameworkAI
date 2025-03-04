@@ -21,10 +21,12 @@ namespace HT.Framework.AI
         private AIButlerAgent _butlerAgent;
         private List<ChatMessage> _messages = new List<ChatMessage>();
         private bool _isReplying = false;
+        private string _userCode;
         private string _userContent;
 
         private Texture _aiButlerIcon;
         private GUIContent _aiButlerGC;
+        private GUIContent _codeGC;
         private Vector2 _sessionScroll;
         private Rect _sessionRect;
 
@@ -56,6 +58,9 @@ namespace HT.Framework.AI
             _aiButlerIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/HTFrameworkAI/Editor/Assistant/Texture/AIButlerIcon.png");
             _aiButlerGC = new GUIContent();
             _aiButlerGC.image = _aiButlerIcon;
+            _codeGC = new GUIContent();
+            _codeGC.image = EditorGUIUtility.IconContent("d_cs Script Icon").image;
+            _codeGC.tooltip = "上传代码";
         }
         private void Update()
         {
@@ -136,6 +141,17 @@ namespace HT.Framework.AI
             GUILayout.Label($"给 {ButlerAgent.Name} 发送指令：");
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
+            GUI.color = string.IsNullOrEmpty(_userCode) ? Color.gray : Color.white;
+            _codeGC.tooltip = string.IsNullOrEmpty(_userCode) ? "上传代码" : "上传代码（已上传）";
+            if (GUILayout.Button(_codeGC, EditorStyles.iconButton))
+            {
+                StringValueEditor.OpenWindow(this, _userCode, "上传代码", (str) =>
+                {
+                    _userCode = string.IsNullOrEmpty(str) ? null : str.Trim();
+                });
+            }
+            GUI.color = Color.white;
+            GUILayout.Space(5);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
@@ -257,7 +273,7 @@ namespace HT.Framework.AI
             _isReplying = true;
 
             _messages.Add(new ChatMessage { Role = "user", Think = null, Content = _userContent, Date = DateTime.Now.ToDefaultDateString() });
-            ButlerAgent.SendMessage(_userContent, (reply) =>
+            ButlerAgent.SendMessage(_userContent, _userCode, (reply) =>
             {
                 _isReplying = false;
 
@@ -270,6 +286,7 @@ namespace HT.Framework.AI
                 Repaint();
             });
             _userContent = null;
+            _userCode = null;
         }
     }
 }

@@ -18,7 +18,8 @@ namespace HT.Framework.AI
         /// 向智能管家发送消息
         /// </summary>
         /// <param name="content">用户消息</param>
+        /// <param name="code">代码内容</param>
         /// <param name="endCallback">结束回调</param>
-        public abstract void SendMessage(string content, HTFAction<string> endCallback);
+        public abstract void SendMessage(string content, string code, HTFAction<string> endCallback);
     }
 }
