@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using static HT.Framework.AI.ChatSession;
 
 namespace HT.Framework.AI
 {
@@ -19,7 +18,7 @@ namespace HT.Framework.AI
 
         private AssistantWindow _assistantWindow;
         private AIButlerAgent _butlerAgent;
-        private List<ChatMessage> _messages = new List<ChatMessage>();
+        private List<Message> _messages = new List<Message>();
         private bool _isReplying = false;
         private string _userCode;
         private string _userContent;
@@ -117,7 +116,7 @@ namespace HT.Framework.AI
             _sessionScroll = GUILayout.BeginScrollView(_sessionScroll);
             for (int i = 0; i < _messages.Count; i++)
             {
-                ChatMessage message = _messages[i];
+                Message message = _messages[i];
                 if (message.Role == "user")
                 {
                     OnUserMessageGUI(message);
@@ -192,7 +191,7 @@ namespace HT.Framework.AI
 
             GUILayout.EndVertical();
         }
-        private void OnUserMessageGUI(ChatMessage message)
+        private void OnUserMessageGUI(Message message)
         {
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -204,9 +203,17 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal("textarea");
             EditorGUILayout.TextArea(message.Content, _assistantWindow._userStyle);
+            if (!string.IsNullOrEmpty(message.Code))
+            {
+                _codeGC.tooltip = "上传了代码";
+                if (GUILayout.Button(_codeGC, EditorStyles.iconButton))
+                {
+                    StringValueEditor.OpenWindow(this, message.Code, "已上传的代码", null);
+                }
+            }
             GUILayout.EndHorizontal();
         }
-        private void OnAssistantMessageGUI(ChatMessage message)
+        private void OnAssistantMessageGUI(Message message)
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label(_aiButlerGC, GUILayout.Width(40), GUILayout.Height(40));
@@ -272,14 +279,14 @@ namespace HT.Framework.AI
         {
             _isReplying = true;
 
-            _messages.Add(new ChatMessage { Role = "user", Think = null, Content = _userContent, Date = DateTime.Now.ToDefaultDateString() });
+            _messages.Add(new Message { Role = "user", Content = _userContent, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode });
             ButlerAgent.SendMessage(_userContent, _userCode, (reply) =>
             {
                 _isReplying = false;
 
                 if (!string.IsNullOrEmpty(reply))
                 {
-                    _messages.Add(new ChatMessage { Role = "assistant", Think = null, Content = reply, Date = DateTime.Now.ToDefaultDateString() });
+                    _messages.Add(new Message { Role = "assistant", Content = reply, Date = DateTime.Now.ToDefaultDateString(), Code = null });
                 }
 
                 Focus();
@@ -287,6 +294,15 @@ namespace HT.Framework.AI
             });
             _userContent = null;
             _userCode = null;
+        }
+
+        [Serializable]
+        private class Message
+        {
+            public string Role;
+            public string Content;
+            public string Date;
+            public string Code;
         }
     }
 }
