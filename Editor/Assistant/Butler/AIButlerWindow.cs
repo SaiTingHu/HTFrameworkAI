@@ -21,11 +21,14 @@ namespace HT.Framework.AI
         private List<Message> _messages = new List<Message>();
         private bool _isReplying = false;
         private string _userCode;
+        private string _userFolderPath;
         private string _userContent;
 
         private Texture _aiButlerIcon;
         private GUIContent _aiButlerGC;
         private GUIContent _codeGC;
+        private GUIContent _folderGC;
+        private GUIContent _noneFolderGC;
         private Vector2 _sessionScroll;
         private Rect _sessionRect;
 
@@ -59,7 +62,10 @@ namespace HT.Framework.AI
             _aiButlerGC.image = _aiButlerIcon;
             _codeGC = new GUIContent();
             _codeGC.image = EditorGUIUtility.IconContent("d_cs Script Icon").image;
-            _codeGC.tooltip = "上传代码";
+            _folderGC = new GUIContent();
+            _folderGC.image = EditorGUIUtility.IconContent("Folder Icon").image;
+            _noneFolderGC = new GUIContent();
+            _noneFolderGC.image = EditorGUIUtility.IconContent("FolderEmpty Icon").image;
         }
         private void Update()
         {
@@ -140,6 +146,7 @@ namespace HT.Framework.AI
             GUILayout.Label($"给 {ButlerAgent.Name} 发送指令：");
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
+
             GUI.color = string.IsNullOrEmpty(_userCode) ? Color.gray : Color.white;
             _codeGC.tooltip = string.IsNullOrEmpty(_userCode) ? "上传代码" : "上传代码（已上传）";
             if (GUILayout.Button(_codeGC, EditorStyles.iconButton))
@@ -150,6 +157,19 @@ namespace HT.Framework.AI
                 });
             }
             GUI.color = Color.white;
+
+            GUIContent gc = string.IsNullOrEmpty(_userFolderPath) ? _noneFolderGC : _folderGC;
+            gc.tooltip = string.IsNullOrEmpty(_userFolderPath) ? "选择文件夹" : $"选择文件夹（已选择：{_userFolderPath}）";
+            if (GUILayout.Button(gc, EditorStyles.iconButton))
+            {
+                string path = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, "");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _userFolderPath = "Assets" + path.Replace(Application.dataPath, "");
+                    GUI.FocusControl(null);
+                }
+            }
+
             GUILayout.Space(5);
             GUILayout.EndHorizontal();
 
@@ -209,6 +229,14 @@ namespace HT.Framework.AI
                 if (GUILayout.Button(_codeGC, EditorStyles.iconButton))
                 {
                     StringValueEditor.OpenWindow(this, message.Code, "已上传的代码", null);
+                }
+            }
+            if (!string.IsNullOrEmpty(message.FolderPath))
+            {
+                _folderGC.tooltip = "选择了文件夹";
+                if (GUILayout.Button(_folderGC, EditorStyles.iconButton))
+                {
+                    Selection.activeObject = AssetDatabase.LoadAssetAtPath<DefaultAsset>(message.FolderPath);
                 }
             }
             GUILayout.EndHorizontal();
@@ -279,14 +307,14 @@ namespace HT.Framework.AI
         {
             _isReplying = true;
 
-            _messages.Add(new Message { Role = "user", Content = _userContent, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode });
-            ButlerAgent.SendMessage(_userContent, _userCode, (reply) =>
+            _messages.Add(new Message { Role = "user", Content = _userContent, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode, FolderPath = _userFolderPath });
+            ButlerAgent.SendMessage(_userContent, _userCode, _userFolderPath, (reply) =>
             {
                 _isReplying = false;
 
                 if (!string.IsNullOrEmpty(reply))
                 {
-                    _messages.Add(new Message { Role = "assistant", Content = reply, Date = DateTime.Now.ToDefaultDateString(), Code = null });
+                    _messages.Add(new Message { Role = "assistant", Content = reply, Date = DateTime.Now.ToDefaultDateString(), Code = null, FolderPath = null });
                 }
 
                 Focus();
@@ -294,6 +322,7 @@ namespace HT.Framework.AI
             });
             _userContent = null;
             _userCode = null;
+            _userFolderPath = null;
         }
 
         [Serializable]
@@ -303,6 +332,7 @@ namespace HT.Framework.AI
             public string Content;
             public string Date;
             public string Code;
+            public string FolderPath;
         }
     }
 }

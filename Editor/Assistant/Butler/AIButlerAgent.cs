@@ -19,7 +19,8 @@ namespace HT.Framework.AI
         /// </summary>
         /// <param name="content">用户消息</param>
         /// <param name="code">代码内容</param>
+        /// <param name="folderPath">选择的文件夹路径</param>
         /// <param name="endCallback">结束回调</param>
-        public abstract void SendMessage(string content, string code, HTFAction<string> endCallback);
+        public abstract void SendMessage(string content, string code, string folderPath, HTFAction<string> endCallback);
     }
 }
