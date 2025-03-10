@@ -80,7 +80,7 @@ namespace HT.Framework.AI
         private bool _isLogInEditor;
         private bool _isShowThink;
         private AssistantSessionSavePath _savePath;
-        private bool _isEnableAIButler;
+        private bool _isEnableAIAgent;
 
         protected override void OnEnable()
         {
@@ -98,7 +98,7 @@ namespace HT.Framework.AI
             _isLogInEditor = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, false);
             _isShowThink = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_ShowThink, false);
             _savePath = (AssistantSessionSavePath)EditorPrefs.GetInt(EditorPrefsTableAI.Assistant_SavePath, 0);
-            _isEnableAIButler = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_EnableAIButler, false);
+            _isEnableAIAgent = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_EnableAIAgent, false);
         }
         protected override void OnBodyGUI()
         {
@@ -167,9 +167,9 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUI.color = _isEnableAIButler ? Color.green : Color.gray;
-            GUILayout.Label("启用智能管家", GUILayout.Width(120));
-            _isEnableAIButler = EditorGUILayout.Toggle(_isEnableAIButler);
+            GUI.color = _isEnableAIAgent ? Color.green : Color.gray;
+            GUILayout.Label("启用通用智能体", GUILayout.Width(120));
+            _isEnableAIAgent = EditorGUILayout.Toggle(_isEnableAIAgent);
             GUI.color = Color.white;
             GUILayout.EndHorizontal();
 
@@ -212,7 +212,7 @@ namespace HT.Framework.AI
                 EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_IsLogInEditor, _isLogInEditor);
                 EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_ShowThink, _isShowThink);
                 EditorPrefs.SetInt(EditorPrefsTableAI.Assistant_SavePath, (int)_savePath);
-                EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_EnableAIButler, _isEnableAIButler);
+                EditorPrefs.SetBool(EditorPrefsTableAI.Assistant_EnableAIAgent, _isEnableAIAgent);
                 _assistantWindow.ApplySettings();
                 Close();
             }

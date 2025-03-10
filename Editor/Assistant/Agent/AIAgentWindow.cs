@@ -5,27 +5,27 @@ using UnityEngine;
 
 namespace HT.Framework.AI
 {
-    internal sealed class AIButlerWindow : HTFEditorWindow
+    internal sealed class AIAgentWindow : HTFEditorWindow
     {
         public static void OpenWindow(AssistantWindow assistantWindow)
         {
-            AIButlerWindow window = GetWindow<AIButlerWindow>();
+            AIAgentWindow window = GetWindow<AIAgentWindow>();
             window.titleContent.image = EditorGUIUtility.IconContent("ParticleSystemForceField Icon").image;
-            window.titleContent.text = "AI Butler";
+            window.titleContent.text = "AI Agent";
             window._assistantWindow = assistantWindow;
             window.Show();
         }
 
         private AssistantWindow _assistantWindow;
-        private AIButlerAgent _butlerAgent;
+        private AIAgent _agent;
         private List<Message> _messages = new List<Message>();
         private bool _isReplying = false;
         private string _userCode;
         private string _userFolderPath;
         private string _userContent;
 
-        private Texture _aiButlerIcon;
-        private GUIContent _aiButlerGC;
+        private Texture _aiAgentIcon;
+        private GUIContent _aiAgentGC;
         private GUIContent _codeGC;
         private GUIContent _folderGC;
         private GUIContent _noneFolderGC;
@@ -33,23 +33,23 @@ namespace HT.Framework.AI
         private Rect _sessionRect;
 
         /// <summary>
-        /// 智能管家行为代理
+        /// AI智能体
         /// </summary>
-        private AIButlerAgent ButlerAgent
+        private AIAgent Agent
         {
             get
             {
-                if (_butlerAgent == null)
+                if (_agent == null)
                 {
-                    string agent = EditorPrefs.GetString(EditorPrefsTableAI.AIButler_Agent, "<None>");
+                    string agent = EditorPrefs.GetString(EditorPrefsTableAI.AIAgent_Type, "<None>");
                     Type type = (agent == "<None>") ? null : ReflectionToolkit.GetTypeInAllAssemblies(agent, false);
                     if (type != null)
                     {
-                        _butlerAgent = Activator.CreateInstance(type) as AIButlerAgent;
-                        _butlerAgent.InitAgent();
+                        _agent = Activator.CreateInstance(type) as AIAgent;
+                        _agent.InitAgent();
                     }
                 }
-                return _butlerAgent;
+                return _agent;
             }
         }
 
@@ -57,9 +57,9 @@ namespace HT.Framework.AI
         {
             base.OnEnable();
 
-            _aiButlerIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/HTFrameworkAI/Editor/Assistant/Texture/AIButlerIcon.png");
-            _aiButlerGC = new GUIContent();
-            _aiButlerGC.image = _aiButlerIcon;
+            _aiAgentIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/HTFrameworkAI/Editor/Assistant/Texture/AIAgentIcon.png");
+            _aiAgentGC = new GUIContent();
+            _aiAgentGC.image = _aiAgentIcon;
             _codeGC = new GUIContent();
             _codeGC.image = EditorGUIUtility.IconContent("d_cs Script Icon").image;
             _folderGC = new GUIContent();
@@ -82,14 +82,14 @@ namespace HT.Framework.AI
 
             if (GUILayout.Button(_assistantWindow._settingsGC, EditorStyles.iconButton))
             {
-                AIButlerSettingsWindow.OpenWindow(_assistantWindow);
+                AIAgentSettingsWindow.OpenWindow(_assistantWindow);
             }
         }
         protected override void OnBodyGUI()
         {
             base.OnBodyGUI();
 
-            if (ButlerAgent != null)
+            if (Agent != null)
             {
                 EventHandle();
                 OnSessionGUI();
@@ -105,7 +105,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            GUILayout.Label(ButlerAgent.Name, "WarningOverlay", GUILayout.ExpandWidth(true));
+            GUILayout.Label(Agent.Name, "WarningOverlay", GUILayout.ExpandWidth(true));
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
@@ -143,7 +143,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.color = Color.yellow;
-            GUILayout.Label($"给 {ButlerAgent.Name} 发送指令：");
+            GUILayout.Label($"给 {Agent.Name} 发送指令：");
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
 
@@ -181,7 +181,7 @@ namespace HT.Framework.AI
             GUI.enabled = !string.IsNullOrEmpty(_userContent) && !_isReplying;
             if (GUILayout.Button("发送指令", EditorGlobalTools.Styles.LargeButton))
             {
-                SendMessage();
+                SendInstruction();
                 ToSessionScrollBottom();
             }
             GUI.enabled = true;
@@ -200,7 +200,7 @@ namespace HT.Framework.AI
             GUILayout.FlexibleSpace();
 
             GUI.color = Color.yellow;
-            GUILayout.Label("当前无法启用智能管家，请设置【智能管家代理】。", EditorStyles.largeLabel);
+            GUILayout.Label("当前无法启用智能体，请设置有效的【智能体类型】。", EditorStyles.largeLabel);
             GUI.color = Color.white;
 
             GUILayout.FlexibleSpace();
@@ -244,7 +244,7 @@ namespace HT.Framework.AI
         private void OnAssistantMessageGUI(Message message)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(_aiButlerGC, GUILayout.Width(40), GUILayout.Height(40));
+            GUILayout.Label(_aiAgentGC, GUILayout.Width(40), GUILayout.Height(40));
             GUI.color = Color.gray;
             GUILayout.Label(message.Date, _assistantWindow._dateStyle, GUILayout.Height(40));
             GUI.color = Color.white;
@@ -260,7 +260,7 @@ namespace HT.Framework.AI
             if (_isReplying)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(_aiButlerGC, GUILayout.Width(40), GUILayout.Height(40));
+                GUILayout.Label(_aiAgentGC, GUILayout.Width(40), GUILayout.Height(40));
                 GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
 
@@ -285,7 +285,7 @@ namespace HT.Framework.AI
                         case KeyCode.KeypadEnter:
                             if (!string.IsNullOrEmpty(_userContent) && !_isReplying)
                             {
-                                SendMessage();
+                                SendInstruction();
                                 EditorApplication.delayCall += ToSessionScrollBottom;
                                 GUI.FocusControl(null);
                             }
@@ -301,14 +301,14 @@ namespace HT.Framework.AI
         }
 
         /// <summary>
-        /// 发送消息（智能管家）
+        /// 发送指令
         /// </summary>
-        private void SendMessage()
+        private void SendInstruction()
         {
             _isReplying = true;
 
             _messages.Add(new Message { Role = "user", Content = _userContent, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode, FolderPath = _userFolderPath });
-            ButlerAgent.SendMessage(_userContent, _userCode, _userFolderPath, (reply) =>
+            Agent.SendInstruction(_userContent, _userCode, _userFolderPath, (reply) =>
             {
                 _isReplying = false;
 

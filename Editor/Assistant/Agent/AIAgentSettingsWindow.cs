@@ -5,12 +5,12 @@ using UnityEngine;
 
 namespace HT.Framework.AI
 {
-    internal sealed class AIButlerSettingsWindow : HTFEditorWindow
+    internal sealed class AIAgentSettingsWindow : HTFEditorWindow
     {
         public static void OpenWindow(AssistantWindow assistantWindow)
         {
-            AIButlerSettingsWindow window = GetWindow<AIButlerSettingsWindow>();
-            window.titleContent.text = "AIButler Settings";
+            AIAgentSettingsWindow window = GetWindow<AIAgentSettingsWindow>();
+            window.titleContent.text = "AIAgent Settings";
             window._assistantWindow = assistantWindow;
             window.minSize = new Vector2(300, 200);
             window.maxSize = new Vector2(300, 200);
@@ -29,19 +29,19 @@ namespace HT.Framework.AI
         {
             base.OnEnable();
 
-            _agent = EditorPrefs.GetString(EditorPrefsTableAI.AIButler_Agent, "<None>");
-            _permissionOpenURL = EditorPrefs.GetBool(EditorPrefsTableAI.AIButler_PermissionOpenURL, false);
-            _permissionOpenProgram = EditorPrefs.GetBool(EditorPrefsTableAI.AIButler_PermissionOpenProgram, false);
-            _permissionRunCode = EditorPrefs.GetBool(EditorPrefsTableAI.AIButler_PermissionRunCode, false);
-            _permissionReadFile = EditorPrefs.GetBool(EditorPrefsTableAI.AIButler_PermissionReadFile, false);
-            _permissionWriteFile = EditorPrefs.GetBool(EditorPrefsTableAI.AIButler_PermissionWriteFile, false);
+            _agent = EditorPrefs.GetString(EditorPrefsTableAI.AIAgent_Type, "<None>");
+            _permissionOpenURL = EditorPrefs.GetBool(EditorPrefsTableAI.AIAgent_PermissionOpenURL, false);
+            _permissionOpenProgram = EditorPrefs.GetBool(EditorPrefsTableAI.AIAgent_PermissionOpenProgram, false);
+            _permissionRunCode = EditorPrefs.GetBool(EditorPrefsTableAI.AIAgent_PermissionRunCode, false);
+            _permissionReadFile = EditorPrefs.GetBool(EditorPrefsTableAI.AIAgent_PermissionReadFile, false);
+            _permissionWriteFile = EditorPrefs.GetBool(EditorPrefsTableAI.AIAgent_PermissionWriteFile, false);
         }
         protected override void OnBodyGUI()
         {
             base.OnBodyGUI();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("智能管家代理", GUILayout.Width(120));
+            GUILayout.Label("智能体类型", GUILayout.Width(120));
             if (GUILayout.Button(_agent, EditorStyles.popup))
             {
                 GenericMenu gm = new GenericMenu();
@@ -52,7 +52,7 @@ namespace HT.Framework.AI
                 gm.AddSeparator("");
                 List<Type> types = ReflectionToolkit.GetTypesInAllAssemblies(type =>
                 {
-                    return type.IsSubclassOf(typeof(AIButlerAgent)) && !type.IsAbstract;
+                    return type.IsSubclassOf(typeof(AIAgent)) && !type.IsAbstract;
                 }, false);
                 for (int i = 0; i < types.Count; i++)
                 {
@@ -67,7 +67,7 @@ namespace HT.Framework.AI
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("智能管家权限：");
+            GUILayout.Label("智能体权限：");
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
@@ -101,12 +101,12 @@ namespace HT.Framework.AI
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("保存", "ButtonLeft"))
             {
-                EditorPrefs.SetString(EditorPrefsTableAI.AIButler_Agent, _agent);
-                EditorPrefs.SetBool(EditorPrefsTableAI.AIButler_PermissionOpenURL, _permissionOpenURL);
-                EditorPrefs.SetBool(EditorPrefsTableAI.AIButler_PermissionOpenProgram, _permissionOpenProgram);
-                EditorPrefs.SetBool(EditorPrefsTableAI.AIButler_PermissionRunCode, _permissionRunCode);
-                EditorPrefs.SetBool(EditorPrefsTableAI.AIButler_PermissionReadFile, _permissionReadFile);
-                EditorPrefs.SetBool(EditorPrefsTableAI.AIButler_PermissionWriteFile, _permissionWriteFile);
+                EditorPrefs.SetString(EditorPrefsTableAI.AIAgent_Type, _agent);
+                EditorPrefs.SetBool(EditorPrefsTableAI.AIAgent_PermissionOpenURL, _permissionOpenURL);
+                EditorPrefs.SetBool(EditorPrefsTableAI.AIAgent_PermissionOpenProgram, _permissionOpenProgram);
+                EditorPrefs.SetBool(EditorPrefsTableAI.AIAgent_PermissionRunCode, _permissionRunCode);
+                EditorPrefs.SetBool(EditorPrefsTableAI.AIAgent_PermissionReadFile, _permissionReadFile);
+                EditorPrefs.SetBool(EditorPrefsTableAI.AIAgent_PermissionWriteFile, _permissionWriteFile);
                 Close();
             }
             if (GUILayout.Button("取消", "ButtonRight"))

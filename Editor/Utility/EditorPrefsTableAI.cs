@@ -69,33 +69,33 @@
         /// </summary>
         public static readonly string Assistant_SavePath = "HT.Framework.AI.Assistant.SavePath";
         /// <summary>
-        /// AI助手的 EnableAIButler 配置
+        /// AI助手的 EnableAIAgent 配置
         /// </summary>
-        public static readonly string Assistant_EnableAIButler = "HT.Framework.AI.Assistant.EnableAIButler";
+        public static readonly string Assistant_EnableAIAgent = "HT.Framework.AI.Assistant.EnableAIAgent";
         /// <summary>
-        /// AI智能管家的 Agent 配置
+        /// AI智能体的 Type 配置
         /// </summary>
-        public static readonly string AIButler_Agent = "HT.Framework.AI.AIButler.Agent";
+        public static readonly string AIAgent_Type = "HT.Framework.AI.AIAgent.Type";
         /// <summary>
-        /// AI智能管家的 Permission.OpenURL 配置
+        /// AI智能体的 Permission.OpenURL 配置
         /// </summary>
-        public static readonly string AIButler_PermissionOpenURL = "HT.Framework.AI.AIButler.Permission.OpenURL";
+        public static readonly string AIAgent_PermissionOpenURL = "HT.Framework.AI.AIAgent.Permission.OpenURL";
         /// <summary>
-        /// AI智能管家的 Permission.OpenProgram 配置
+        /// AI智能体的 Permission.OpenProgram 配置
         /// </summary>
-        public static readonly string AIButler_PermissionOpenProgram = "HT.Framework.AI.AIButler.Permission.OpenProgram";
+        public static readonly string AIAgent_PermissionOpenProgram = "HT.Framework.AI.AIAgent.Permission.OpenProgram";
         /// <summary>
-        /// AI智能管家的 Permission.RunCode 配置
+        /// AI智能体的 Permission.RunCode 配置
         /// </summary>
-        public static readonly string AIButler_PermissionRunCode = "HT.Framework.AI.AIButler.Permission.RunCode";
+        public static readonly string AIAgent_PermissionRunCode = "HT.Framework.AI.AIAgent.Permission.RunCode";
         /// <summary>
-        /// AI智能管家的 Permission.ReadFile 配置
+        /// AI智能体的 Permission.ReadFile 配置
         /// </summary>
-        public static readonly string AIButler_PermissionReadFile = "HT.Framework.AI.AIButler.Permission.ReadFile";
+        public static readonly string AIAgent_PermissionReadFile = "HT.Framework.AI.AIAgent.Permission.ReadFile";
         /// <summary>
-        /// AI智能管家的 Permission.WriteFile 配置
+        /// AI智能体的 Permission.WriteFile 配置
         /// </summary>
-        public static readonly string AIButler_PermissionWriteFile = "HT.Framework.AI.AIButler.Permission.WriteFile";
+        public static readonly string AIAgent_PermissionWriteFile = "HT.Framework.AI.AIAgent.Permission.WriteFile";
         #endregion
     }
 }

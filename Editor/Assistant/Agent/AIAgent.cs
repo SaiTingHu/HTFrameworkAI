@@ -1,26 +1,26 @@
 namespace HT.Framework.AI
 {
     /// <summary>
-    /// 智能管家的行为代理
+    /// AI智能体
     /// </summary>
-    public abstract class AIButlerAgent
+    public abstract class AIAgent
     {
         /// <summary>
-        /// 智能管家姓名
+        /// 智能体名称
         /// </summary>
         public abstract string Name { get; }
 
         /// <summary>
-        /// 初始化智能管家
+        /// 初始化智能体
         /// </summary>
         public abstract void InitAgent();
         /// <summary>
-        /// 向智能管家发送消息
+        /// 向智能体发送指令
         /// </summary>
-        /// <param name="content">用户消息</param>
+        /// <param name="content">用户指令</param>
         /// <param name="code">代码内容</param>
         /// <param name="folderPath">选择的文件夹路径</param>
         /// <param name="endCallback">结束回调</param>
-        public abstract void SendMessage(string content, string code, string folderPath, HTFAction<string> endCallback);
+        public abstract void SendInstruction(string content, string code, string folderPath, HTFAction<string> endCallback);
     }
 }

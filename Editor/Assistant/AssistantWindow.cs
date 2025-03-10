@@ -56,7 +56,7 @@ namespace HT.Framework.AI
         internal GUIContent _noFoldGC;
         internal GUIContent _copyGC;
         internal GUIContent _markdownGC;
-        internal GUIContent _butlerGC;
+        internal GUIContent _agentGC;
         internal GUIStyle _userStyle;
         internal GUIStyle _assistantStyle;
         internal GUIStyle _dateStyle;
@@ -70,7 +70,7 @@ namespace HT.Framework.AI
         {
             base.OnEnable();
 
-            _isEnableAIButler = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_EnableAIButler, false);
+            _isEnableAIButler = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_EnableAIAgent, false);
             _isShowThink = EditorPrefs.GetBool(EditorPrefsTableAI.Assistant_ShowThink, false);
             _markdownWindowType = Type.GetType("HT.ModuleManager.Markdown.MarkdownWindow,HT.ModuleManager");
 
@@ -104,10 +104,10 @@ namespace HT.Framework.AI
             _markdownGC = new GUIContent();
             _markdownGC.image = EditorGUIUtility.IconContent("d_UnityEditor.ConsoleWindow").image;
             _markdownGC.tooltip = "在通用 Markdown 查看窗口中预览内容";
-            _butlerGC = new GUIContent();
-            _butlerGC.image = EditorGUIUtility.IconContent("ParticleSystemForceField Icon").image;
-            _butlerGC.text = "智能管家";
-            _butlerGC.tooltip = "智能管家";
+            _agentGC = new GUIContent();
+            _agentGC.image = EditorGUIUtility.IconContent("ParticleSystemForceField Icon").image;
+            _agentGC.text = "编辑器通用智能体";
+            _agentGC.tooltip = "编辑器通用智能体";
 
             if (_userStyle == null)
             {
@@ -213,9 +213,9 @@ namespace HT.Framework.AI
             if (_isEnableAIButler)
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(_butlerGC, EditorGlobalTools.Styles.LargeButton))
+                if (GUILayout.Button(_agentGC, EditorGlobalTools.Styles.LargeButton))
                 {
-                    AIButlerWindow.OpenWindow(this);
+                    AIAgentWindow.OpenWindow(this);
                 }
                 GUILayout.EndHorizontal();
             }
