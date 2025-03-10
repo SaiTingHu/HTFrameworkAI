@@ -19,6 +19,7 @@ namespace HT.Framework.AI
         private AssistantWindow _assistantWindow;
         private AIAgent _agent;
         private List<Message> _messages = new List<Message>();
+        private bool _isThinking = false;
         private bool _isReplying = false;
         private string _userCode;
         private string _userFolderPath;
@@ -134,7 +135,7 @@ namespace HT.Framework.AI
                 GUILayout.Space(5);
             }
             _sessionRect = _messages.Count > 0 ? GUILayoutUtility.GetLastRect() : Rect.zero;
-            OnReplyingMessageGUI();
+            OnThinkingMessageGUI();
             GUILayout.EndScrollView();
 
             GUILayout.FlexibleSpace();
@@ -173,9 +174,20 @@ namespace HT.Framework.AI
             GUILayout.Space(5);
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            _userContent = EditorGUILayout.TextArea(_userContent, GUILayout.MinHeight(40));
-            GUILayout.EndHorizontal();
+            if (_isReplying)
+            {
+                GUILayout.BeginHorizontal();
+                GUI.enabled = false;
+                EditorGUILayout.TextArea($"{Agent.Name} 正在处理指令，请稍后......", GUILayout.MinHeight(40));
+                GUI.enabled = true;
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                GUILayout.BeginHorizontal();
+                _userContent = EditorGUILayout.TextArea(_userContent, GUILayout.MinHeight(40));
+                GUILayout.EndHorizontal();
+            }
 
             GUILayout.BeginHorizontal();
             GUI.enabled = !string.IsNullOrEmpty(_userContent) && !_isReplying;
@@ -255,9 +267,9 @@ namespace HT.Framework.AI
             EditorGUILayout.TextArea(message.Content, _assistantWindow._assistantStyle);
             GUILayout.EndHorizontal();
         }
-        private void OnReplyingMessageGUI()
+        private void OnThinkingMessageGUI()
         {
-            if (_isReplying)
+            if (_isThinking)
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(_aiAgentGC, GUILayout.Width(40), GUILayout.Height(40));
@@ -305,20 +317,26 @@ namespace HT.Framework.AI
         /// </summary>
         private void SendInstruction()
         {
+            _isThinking = true;
             _isReplying = true;
 
             _messages.Add(new Message { Role = "user", Content = _userContent, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode, FolderPath = _userFolderPath });
-            Agent.SendInstruction(_userContent, _userCode, _userFolderPath, (reply) =>
+            Agent.SendInstruction(_userContent, _userCode, _userFolderPath, (done, reply) =>
             {
-                _isReplying = false;
+                _isThinking = false;
+
+                if (done)
+                {
+                    _isReplying = false;
+                }
 
                 if (!string.IsNullOrEmpty(reply))
                 {
                     _messages.Add(new Message { Role = "assistant", Content = reply, Date = DateTime.Now.ToDefaultDateString(), Code = null, FolderPath = null });
+                    EditorApplication.delayCall += ToSessionScrollBottom;
                 }
 
                 Focus();
-                Repaint();
             });
             _userContent = null;
             _userCode = null;
