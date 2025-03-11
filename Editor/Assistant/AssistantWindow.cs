@@ -56,6 +56,7 @@ namespace HT.Framework.AI
         internal GUIContent _noFoldGC;
         internal GUIContent _copyGC;
         internal GUIContent _markdownGC;
+        internal GUIContent _imageGenerationGC;
         internal GUIContent _agentGC;
         internal GUIStyle _userStyle;
         internal GUIStyle _assistantStyle;
@@ -104,10 +105,12 @@ namespace HT.Framework.AI
             _markdownGC = new GUIContent();
             _markdownGC.image = EditorGUIUtility.IconContent("d_UnityEditor.ConsoleWindow").image;
             _markdownGC.tooltip = "在通用 Markdown 查看窗口中预览内容";
+            _imageGenerationGC = new GUIContent();
+            _imageGenerationGC.image = EditorGUIUtility.IconContent("d_RawImage Icon").image;
+            _imageGenerationGC.text = "AI画图";
             _agentGC = new GUIContent();
             _agentGC.image = EditorGUIUtility.IconContent("ParticleSystemForceField Icon").image;
             _agentGC.text = "编辑器通用智能体";
-            _agentGC.tooltip = "编辑器通用智能体";
 
             if (_userStyle == null)
             {
@@ -210,16 +213,6 @@ namespace HT.Framework.AI
 
             GUI.enabled = !_isReplying;
 
-            if (_isEnableAIButler)
-            {
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button(_agentGC, EditorGlobalTools.Styles.LargeButton))
-                {
-                    AIAgentWindow.OpenWindow(this);
-                }
-                GUILayout.EndHorizontal();
-            }
-
             for (int i = 0; i < _sessions.Count; i++)
             {
                 if (_currentSession == i) GUILayout.BeginHorizontal("InsertionMarker");
@@ -252,6 +245,27 @@ namespace HT.Framework.AI
                         GUI.FocusControl(null);
                     }
                 }
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.FlexibleSpace();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(_imageGenerationGC, EditorGlobalTools.Styles.LargeButton))
+            {
+                ImageGenerationWindow.OpenWindow(this);
+            }
+            GUILayout.EndHorizontal();
+
+            if (_isEnableAIButler)
+            {
+                GUILayout.BeginHorizontal();
+                GUI.backgroundColor = Color.green;
+                if (GUILayout.Button(_agentGC, EditorGlobalTools.Styles.LargeButton))
+                {
+                    AIAgentWindow.OpenWindow(this);
+                }
+                GUI.backgroundColor = Color.white;
                 GUILayout.EndHorizontal();
             }
 
@@ -353,7 +367,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.color = Color.yellow;
-            GUILayout.Label("给AI助手发送消息：");
+            GUILayout.Label("给【AI助手】发送消息：");
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -487,7 +501,7 @@ namespace HT.Framework.AI
                             if (!string.IsNullOrEmpty(_userContent) && !_isReplying)
                             {
                                 SendMessage();
-                                EditorApplication.delayCall += ToSessionScrollBottom;
+                                ToSessionScrollBottom();
                                 GUI.FocusControl(null);
                             }
                             break;
@@ -497,8 +511,11 @@ namespace HT.Framework.AI
         }
         private void ToSessionScrollBottom()
         {
-            _sessionScroll = _sessionRect.position;
-            Repaint();
+            EditorApplication.delayCall += () =>
+            {
+                _sessionScroll = _sessionRect.position;
+                Repaint();
+            };
         }
 
         /// <summary>

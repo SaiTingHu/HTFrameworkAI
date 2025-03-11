@@ -12,7 +12,7 @@ HTFramework的AI模块，必须依赖于HTFramework主框架使用。
 
 ## 模块简介
 
-- [Assistant](https://wanderer.blog.csdn.net/article/details/145637201) - AI语言助手，支持在Unity中接入DeepSeek等AI语言大模型。
+- [Assistant](https://wanderer.blog.csdn.net/article/details/145637201) - AI助手，支持在Unity中接入DeepSeek等AI语言大模型，支持AI画图，支持定制AI智能体（Agent）。
 
 - [Pathfinding](https://wanderer.blog.csdn.net/article/details/103761142) - 常规的A*寻路算法，目前支持两点间寻路，或只提供起点后根据行走值寻所有可行走节点。
 

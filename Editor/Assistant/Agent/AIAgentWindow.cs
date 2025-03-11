@@ -144,7 +144,7 @@ namespace HT.Framework.AI
 
             GUILayout.BeginHorizontal();
             GUI.color = Color.yellow;
-            GUILayout.Label($"给 {Agent.Name} 发送指令：");
+            GUILayout.Label($"给【{Agent.Name}】发送指令：");
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
 
@@ -298,7 +298,7 @@ namespace HT.Framework.AI
                             if (!string.IsNullOrEmpty(_userContent) && !_isReplying)
                             {
                                 SendInstruction();
-                                EditorApplication.delayCall += ToSessionScrollBottom;
+                                ToSessionScrollBottom();
                                 GUI.FocusControl(null);
                             }
                             break;
@@ -308,8 +308,11 @@ namespace HT.Framework.AI
         }
         private void ToSessionScrollBottom()
         {
-            _sessionScroll = _sessionRect.position;
-            Repaint();
+            EditorApplication.delayCall += () =>
+            {
+                _sessionScroll = _sessionRect.position;
+                Repaint();
+            };
         }
 
         /// <summary>
@@ -333,7 +336,7 @@ namespace HT.Framework.AI
                 if (!string.IsNullOrEmpty(reply))
                 {
                     _messages.Add(new Message { Role = "assistant", Content = reply, Date = DateTime.Now.ToDefaultDateString(), Code = null, FolderPath = null });
-                    EditorApplication.delayCall += ToSessionScrollBottom;
+                    ToSessionScrollBottom();
                 }
 
                 Focus();
