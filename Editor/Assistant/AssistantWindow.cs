@@ -116,11 +116,13 @@ namespace HT.Framework.AI
             {
                 _userStyle = new GUIStyle(EditorStyles.wordWrappedLabel);
                 _userStyle.alignment = TextAnchor.MiddleRight;
+                _userStyle.richText = true;
             }
             if (_assistantStyle == null)
             {
                 _assistantStyle = new GUIStyle(EditorStyles.wordWrappedLabel);
                 _assistantStyle.alignment = TextAnchor.MiddleLeft;
+                _assistantStyle.richText = true;
             }
             if (_dateStyle == null)
             {

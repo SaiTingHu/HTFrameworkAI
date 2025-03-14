@@ -24,12 +24,12 @@ namespace HT.Framework.AI
         private string _userCode;
         private string _userFolderPath;
         private string _userContent;
+        private string _userAt = "@";
 
         private Texture _aiAgentIcon;
         private GUIContent _aiAgentGC;
         private GUIContent _codeGC;
         private GUIContent _folderGC;
-        private GUIContent _noneFolderGC;
         private Vector2 _sessionScroll;
         private Rect _sessionRect;
 
@@ -65,8 +65,6 @@ namespace HT.Framework.AI
             _codeGC.image = EditorGUIUtility.IconContent("d_cs Script Icon").image;
             _folderGC = new GUIContent();
             _folderGC.image = EditorGUIUtility.IconContent("Folder Icon").image;
-            _noneFolderGC = new GUIContent();
-            _noneFolderGC.image = EditorGUIUtility.IconContent("FolderEmpty Icon").image;
         }
         private void Update()
         {
@@ -145,6 +143,25 @@ namespace HT.Framework.AI
             GUILayout.BeginHorizontal();
             GUI.color = Color.yellow;
             GUILayout.Label($"给【{Agent.Name}】发送指令：");
+            GUI.color = _userAt != "@" ? Color.yellow : Color.gray;
+            if (GUILayout.Button(_userAt, EditorStyles.popup))
+            {
+                GenericMenu gm = new GenericMenu();
+                for (int i = 0; i < Agent.Ats.Length; i++)
+                {
+                    string at = Agent.Ats[i];
+                    gm.AddItem(new GUIContent(at), at == _userAt, () =>
+                    {
+                        _userAt = at;
+                    });
+                }
+                gm.AddSeparator("");
+                gm.AddItem(new GUIContent("<None>"), "@" == _userAt, () =>
+                {
+                    _userAt = "@";
+                });
+                gm.ShowAsContext();
+            }
             GUI.color = Color.white;
             GUILayout.FlexibleSpace();
 
@@ -159,9 +176,9 @@ namespace HT.Framework.AI
             }
             GUI.color = Color.white;
 
-            GUIContent gc = string.IsNullOrEmpty(_userFolderPath) ? _noneFolderGC : _folderGC;
-            gc.tooltip = string.IsNullOrEmpty(_userFolderPath) ? "选择文件夹" : $"选择文件夹（已选择：{_userFolderPath}）";
-            if (GUILayout.Button(gc, EditorStyles.iconButton))
+            GUI.color = string.IsNullOrEmpty(_userFolderPath) ? Color.gray : Color.white;
+            _folderGC.tooltip = string.IsNullOrEmpty(_userFolderPath) ? "选择文件夹" : $"选择文件夹（已选择：{_userFolderPath}）";
+            if (GUILayout.Button(_folderGC, EditorStyles.iconButton))
             {
                 string path = EditorUtility.OpenFolderPanel("选择文件夹", Application.dataPath, "");
                 if (!string.IsNullOrEmpty(path))
@@ -170,6 +187,7 @@ namespace HT.Framework.AI
                     GUI.FocusControl(null);
                 }
             }
+            GUI.color = Color.white;
 
             GUILayout.Space(5);
             GUILayout.EndHorizontal();
@@ -323,8 +341,9 @@ namespace HT.Framework.AI
             _isThinking = true;
             _isReplying = true;
 
-            _messages.Add(new Message { Role = "user", Content = _userContent, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode, FolderPath = _userFolderPath });
-            Agent.SendInstruction(_userContent, _userCode, _userFolderPath, (done, reply) =>
+            string at = _userAt != "@" ? $" <color=yellow>{_userAt}</color>" : "";
+            _messages.Add(new Message { Role = "user", Content = _userContent + at, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode, FolderPath = _userFolderPath });
+            Agent.SendInstruction(_userContent, _userCode, _userFolderPath, _userAt, (done, reply) =>
             {
                 _isThinking = false;
 
