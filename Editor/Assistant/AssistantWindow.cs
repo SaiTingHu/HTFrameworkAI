@@ -61,6 +61,7 @@ namespace HT.Framework.AI
         internal GUIStyle _userStyle;
         internal GUIStyle _assistantStyle;
         internal GUIStyle _dateStyle;
+        internal GUIStyle _userInputStyle;
         private Vector2 _sessionListScroll;
         private Vector2 _sessionScroll;
         private Rect _sessionRect;
@@ -128,6 +129,11 @@ namespace HT.Framework.AI
             {
                 _dateStyle = new GUIStyle(EditorStyles.boldLabel);
                 _dateStyle.alignment = TextAnchor.LowerCenter;
+            }
+            if (_userInputStyle == null)
+            {
+                _userInputStyle = new GUIStyle(EditorStyles.wordWrappedLabel);
+                _userInputStyle.alignment = TextAnchor.UpperLeft;
             }
         }
         private void OnDestroy()
@@ -374,8 +380,8 @@ namespace HT.Framework.AI
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
-            _userContent = EditorGUILayout.TextArea(_userContent, GUILayout.MinHeight(40));
+            GUILayout.BeginHorizontal("textarea");
+            _userContent = EditorGUILayout.TextArea(_userContent, _userInputStyle, GUILayout.MinHeight(40));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();

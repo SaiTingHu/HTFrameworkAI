@@ -202,8 +202,8 @@ namespace HT.Framework.AI
             }
             else
             {
-                GUILayout.BeginHorizontal();
-                _userContent = EditorGUILayout.TextArea(_userContent, GUILayout.MinHeight(40));
+                GUILayout.BeginHorizontal("textarea");
+                _userContent = EditorGUILayout.TextArea(_userContent, _assistantWindow._userInputStyle, GUILayout.MinHeight(40));
                 GUILayout.EndHorizontal();
             }
 

@@ -129,8 +129,8 @@ namespace HT.Framework.AI
             }
             else
             {
-                GUILayout.BeginHorizontal();
-                _prompt = EditorGUILayout.TextArea(_prompt, GUILayout.MinHeight(40));
+                GUILayout.BeginHorizontal("textarea");
+                _prompt = EditorGUILayout.TextArea(_prompt, _assistantWindow._userInputStyle, GUILayout.MinHeight(40));
                 GUILayout.EndHorizontal();
             }
 
