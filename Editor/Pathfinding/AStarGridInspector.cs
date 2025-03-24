@@ -16,7 +16,7 @@ namespace HT.Framework.AI
             base.OnInspectorDefaultGUI();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Evaluation Type", GUILayout.Width(LabelWidth));
+            EditorGUILayout.LabelField("Evaluation Type", GUILayout.Width(LabelWidth));
             if (GUILayout.Button(Target.EvaluationType, EditorGlobalTools.Styles.MiniPopup, GUILayout.Width(EditorGUIUtility.currentViewWidth - LabelWidth - 25)))
             {
                 GenericMenu gm = new GenericMenu();

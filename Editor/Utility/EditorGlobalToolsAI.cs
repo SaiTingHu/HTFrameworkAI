@@ -71,14 +71,28 @@ namespace HT.Framework.AI
         [MenuItem("GameObject/HTFramework/★ AI/A* Grid", false, 200)]
         private static void CreateAStarGrid()
         {
-            GameObject aStar = new GameObject();
-            aStar.name = "New AStarGrid";
-            aStar.transform.localPosition = Vector3.zero;
-            aStar.transform.localRotation = Quaternion.identity;
-            aStar.transform.localScale = Vector3.one;
-            aStar.AddComponent<AStarGrid>();
-            Selection.activeGameObject = aStar;
-            EditorSceneManager.MarkSceneDirty(aStar.scene);
+            GameObject[] objs = Selection.gameObjects;
+            if (objs == null || objs.Length == 0)
+            {
+                GameObject aStar = new GameObject();
+                aStar.name = "New AStarGrid";
+                aStar.transform.localPosition = Vector3.zero;
+                aStar.transform.localRotation = Quaternion.identity;
+                aStar.transform.localScale = Vector3.one;
+                aStar.AddComponent<AStarGrid>();
+                Selection.activeGameObject = aStar;
+                EditorUtility.SetDirty(aStar);
+                EditorSceneManager.MarkSceneDirty(aStar.scene);
+            }
+            else
+            {
+                for (int i = 0; i < objs.Length; i++)
+                {
+                    objs[i].AddComponent<AStarGrid>();
+                    EditorUtility.SetDirty(objs[i]);
+                    EditorSceneManager.MarkSceneDirty(objs[i].scene);
+                }
+            }
         }
         #endregion
     }
