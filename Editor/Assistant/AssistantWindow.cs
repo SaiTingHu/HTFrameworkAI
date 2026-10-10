@@ -435,15 +435,7 @@ namespace HT.Framework.AI
             }
             if (GUILayout.Button(_markdownGC, EditorGlobalTools.Styles.IconButton, GUILayout.Width(20), GUILayout.Height(20)))
             {
-                if (_markdownWindowType != null)
-                {
-                    MethodInfo openWindow = _markdownWindowType.GetMethod("OpenWindowOfContent", BindingFlags.Static | BindingFlags.Public);
-                    openWindow.Invoke(null, new object[] { message.Content });
-                }
-                else
-                {
-                    Log.Error("未找到 HTModuleManager 模块，不支持在通用 Markdown 查看窗口中预览内容。");
-                }
+                OpenWithMarkdownWindow(message.Content);
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -664,6 +656,21 @@ namespace HT.Framework.AI
                 _sessions[i].Timeout = timeout;
                 _sessions[i].Round = round;
                 _sessions[i].IsLogInEditor = isLogInEditor;
+            }
+        }
+        /// <summary>
+        /// 在通用 Markdown 查看窗口中预览内容
+        /// </summary>
+        internal void OpenWithMarkdownWindow(string content)
+        {
+            if (_markdownWindowType != null)
+            {
+                MethodInfo openWindow = _markdownWindowType.GetMethod("OpenWindowOfContent", BindingFlags.Static | BindingFlags.Public);
+                openWindow.Invoke(null, new object[] { content });
+            }
+            else
+            {
+                Log.Error("未找到 HTModuleManager 模块，不支持在通用 Markdown 查看窗口中预览内容。");
             }
         }
         /// <summary>

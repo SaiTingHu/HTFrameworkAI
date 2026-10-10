@@ -22,6 +22,7 @@ namespace HT.Framework.AI
         private bool _isThinking = false;
         private bool _isReplying = false;
         private string _userCode;
+        private string _userFilePath;
         private string _userFolderPath;
         private string _userContent;
         private string _userAt = "@";
@@ -29,6 +30,7 @@ namespace HT.Framework.AI
         private Texture _aiAgentIcon;
         private GUIContent _aiAgentGC;
         private GUIContent _codeGC;
+        private GUIContent _fileGC;
         private GUIContent _folderGC;
         private Vector2 _sessionScroll;
         private Rect _sessionRect;
@@ -63,6 +65,8 @@ namespace HT.Framework.AI
             _aiAgentGC.image = _aiAgentIcon;
             _codeGC = new GUIContent();
             _codeGC.image = EditorGUIUtility.IconContent("d_cs Script Icon").image;
+            _fileGC = new GUIContent();
+            _fileGC.image = EditorGUIUtility.IconContent("TextAsset Icon").image;
             _folderGC = new GUIContent();
             _folderGC.image = EditorGUIUtility.IconContent("Folder Icon").image;
         }
@@ -176,6 +180,19 @@ namespace HT.Framework.AI
             }
             GUI.color = Color.white;
 
+            GUI.color = string.IsNullOrEmpty(_userFilePath) ? Color.gray : Color.white;
+            _fileGC.tooltip = string.IsNullOrEmpty(_userFilePath) ? "选择文件" : $"选择文件（已选择：{_userFilePath}）";
+            if (GUILayout.Button(_fileGC, EditorStyles.iconButton))
+            {
+                string path = EditorUtility.OpenFilePanel("选择文件", Application.dataPath, "");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _userFilePath = "Assets" + path.Replace(Application.dataPath, "");
+                    GUI.FocusControl(null);
+                }
+            }
+            GUI.color = Color.white;
+
             GUI.color = string.IsNullOrEmpty(_userFolderPath) ? Color.gray : Color.white;
             _folderGC.tooltip = string.IsNullOrEmpty(_userFolderPath) ? "选择文件夹" : $"选择文件夹（已选择：{_userFolderPath}）";
             if (GUILayout.Button(_folderGC, EditorStyles.iconButton))
@@ -261,12 +278,20 @@ namespace HT.Framework.AI
                     StringValueEditor.OpenWindow(this, message.Code, "已上传的代码", null);
                 }
             }
+            if (!string.IsNullOrEmpty(message.FilePath))
+            {
+                _fileGC.tooltip = "选择了文件";
+                if (GUILayout.Button(_fileGC, EditorStyles.iconButton))
+                {
+                    EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(message.FilePath));
+                }
+            }
             if (!string.IsNullOrEmpty(message.FolderPath))
             {
                 _folderGC.tooltip = "选择了文件夹";
                 if (GUILayout.Button(_folderGC, EditorStyles.iconButton))
                 {
-                    Selection.activeObject = AssetDatabase.LoadAssetAtPath<DefaultAsset>(message.FolderPath);
+                    EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<DefaultAsset>(message.FolderPath));
                 }
             }
             GUILayout.EndHorizontal();
@@ -281,9 +306,40 @@ namespace HT.Framework.AI
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal("textarea");
-            EditorGUILayout.TextArea(message.Content, _assistantWindow._assistantStyle);
+            GUILayout.BeginVertical("textarea");
+
+            GUILayout.Space(2);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(message.IsFold ? _assistantWindow._noFoldGC : _assistantWindow._foldGC, EditorGlobalTools.Styles.IconButton, GUILayout.Width(20), GUILayout.Height(20)))
+            {
+                message.IsFold = !message.IsFold;
+            }
+            if (GUILayout.Button(_assistantWindow._copyGC, EditorGlobalTools.Styles.IconButton, GUILayout.Width(20), GUILayout.Height(20)))
+            {
+                GUIUtility.systemCopyBuffer = message.Content;
+            }
+            if (GUILayout.Button(_assistantWindow._markdownGC, EditorGlobalTools.Styles.IconButton, GUILayout.Width(20), GUILayout.Height(20)))
+            {
+                _assistantWindow.OpenWithMarkdownWindow(message.Content);
+            }
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
+
+            if (message.IsFold)
+            {
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("内容已折叠......", _assistantWindow._assistantStyle);
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                GUILayout.BeginHorizontal();
+                EditorGUILayout.TextArea(message.Content, _assistantWindow._assistantStyle);
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.EndVertical();
         }
         private void OnThinkingMessageGUI()
         {
@@ -342,8 +398,17 @@ namespace HT.Framework.AI
             _isReplying = true;
 
             string at = _userAt != "@" ? $" <color=yellow>{_userAt}</color>" : "";
-            _messages.Add(new Message { Role = "user", Content = _userContent + at, Date = DateTime.Now.ToDefaultDateString(), Code = _userCode, FolderPath = _userFolderPath });
-            Agent.SendInstruction(_userContent, _userCode, _userFolderPath, _userAt, (done, reply) =>
+            _messages.Add(new Message()
+            {
+                Role = "user",
+                Content = _userContent + at,
+                Date = DateTime.Now.ToDefaultDateString(),
+                Code = _userCode,
+                FilePath = _userFilePath,
+                FolderPath = _userFolderPath,
+                IsFold = false
+            });
+            Agent.SendInstruction(_userContent, _userCode, _userFilePath, _userFolderPath, _userAt, (done, reply) =>
             {
                 _isThinking = false;
 
@@ -354,7 +419,16 @@ namespace HT.Framework.AI
 
                 if (!string.IsNullOrEmpty(reply))
                 {
-                    _messages.Add(new Message { Role = "assistant", Content = reply, Date = DateTime.Now.ToDefaultDateString(), Code = null, FolderPath = null });
+                    _messages.Add(new Message()
+                    {
+                        Role = "assistant",
+                        Content = reply,
+                        Date = DateTime.Now.ToDefaultDateString(),
+                        Code = null,
+                        FilePath = null,
+                        FolderPath = null,
+                        IsFold = false
+                    });
                     ToSessionScrollBottom();
                 }
 
@@ -362,6 +436,7 @@ namespace HT.Framework.AI
             });
             _userContent = null;
             _userCode = null;
+            _userFilePath = null;
             _userFolderPath = null;
         }
 
@@ -372,7 +447,9 @@ namespace HT.Framework.AI
             public string Content;
             public string Date;
             public string Code;
+            public string FilePath;
             public string FolderPath;
+            public bool IsFold;
         }
     }
 }
