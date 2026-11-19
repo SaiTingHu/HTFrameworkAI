@@ -157,6 +157,14 @@ namespace HT.Framework.AI
                 {
                     Application.OpenURL("https://kimi.moonshot.cn");
                 });
+                gm.AddItem(new GUIContent("Workbuddy"), false, () =>
+                {
+                    Application.OpenURL("https://www.workbuddy.cn/app");
+                });
+                gm.AddItem(new GUIContent("豆包"), false, () =>
+                {
+                    Application.OpenURL("https://www.doubao.com/chat/");
+                });
                 gm.AddItem(new GUIContent("智谱清言"), false, () =>
                 {
                     Application.OpenURL("https://chatglm.cn");
@@ -172,10 +180,6 @@ namespace HT.Framework.AI
                 gm.AddItem(new GUIContent("文心一言"), false, () =>
                 {
                     Application.OpenURL("https://yiyan.baidu.com");
-                });
-                gm.AddItem(new GUIContent("豆包"), false, () =>
-                {
-                    Application.OpenURL("https://www.doubao.com/chat/");
                 });
                 gm.ShowAsContext();
             }
