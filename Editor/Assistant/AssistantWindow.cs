@@ -304,7 +304,10 @@ namespace HT.Framework.AI
                         GenericMenu gm = new GenericMenu();
                         gm.AddItem(new GUIContent("重命名"), false, () =>
                         {
-                            AssistantRenameWindow.OpenWindow(this, chatSession);
+                            StringValueEditor.OpenWindow(this, chatSession.Name, "重命名与AI助手的会话", (newName) =>
+                            {
+                                chatSession.Name = newName;
+                            });
                         });
                         gm.AddItem(new GUIContent("清空记录"), false, () =>
                         {
